@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xsi:schemaLocation="
+http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+    <jaxrs:server id="Service" address="/crm">
+        <jaxrs:serviceBeans>
+            <ref component-id="userSvc"/>
+            <ref component-id="addressSvc"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+    <bean id="userSvc" class=" com.vsk.task.service.impl.UserServiceImpl"/>
+    <bean id="addressSvc" class=" com.vsk.task.service.impl.AddressServiceImpl"/>
+
+</blueprint>
