@@ -1,13 +1,14 @@
 package com.vsk.task.dao;
 
 import com.vsk.task.model.User;
+import com.vsk.task.model.dto.UserDTO;
 
 public interface UserDAO {
-    User findUserById(long id);
+    User findUserById(Long id);
 
-    User updateUser(long id, User user);
+    User updateUser(Long id, UserDTO userDTO);
 
-    User createUser(long id, User user);
+    User createUser(UserDTO userDTO);
 
-    void removeUser(long id);
+    void removeUser(Long id);
 }

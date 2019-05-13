@@ -3,6 +3,7 @@ package com.vsk.task.service.impl;
 import com.vsk.task.dao.UserDAO;
 import com.vsk.task.dao.UserHashMapDAO;
 import com.vsk.task.model.User;
+import com.vsk.task.model.dto.UserDTO;
 import com.vsk.task.service.UserService;
 import com.vsk.task.utils.UserValidator;
 
@@ -23,7 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @PUT
     @Path("/users/{id}/")
-    public Response updateUser(@PathParam("id") Long id, User user) {
+    public Response updateUser(@PathParam("id") Long id, UserDTO user) {
         UserValidator userValidator = new UserValidator(user);
         if (userValidator.isValid()) {
             User updatedUser = userDao.updateUser(id, user);
@@ -35,10 +36,10 @@ public class UserServiceImpl implements UserService {
 
     @POST
     @Path("/users/")
-    public Response addUser(User user) {
+    public Response addUser(UserDTO user) {
         UserValidator userValidator = new UserValidator(user);
         if (userValidator.isValid()) {
-            User newUser = userDao.createUser(user.getId(), user);
+            User newUser = userDao.createUser(user);
             return Response.ok().type("application/xml").entity(newUser).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity(userValidator.getErrorMessage()).build();

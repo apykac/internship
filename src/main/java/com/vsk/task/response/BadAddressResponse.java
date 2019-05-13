@@ -1,4 +1,4 @@
-package com.vsk.task.model;
+package com.vsk.task.response;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

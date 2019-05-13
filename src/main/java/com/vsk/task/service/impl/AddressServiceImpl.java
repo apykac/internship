@@ -3,6 +3,7 @@ package com.vsk.task.service.impl;
 import com.vsk.task.dao.AddressDAO;
 import com.vsk.task.dao.AddressHashMapDAO;
 import com.vsk.task.model.Address;
+import com.vsk.task.model.dto.AddressDTO;
 import com.vsk.task.service.AddressService;
 import com.vsk.task.utils.AddressValidator;
 
@@ -22,10 +23,10 @@ public class AddressServiceImpl implements AddressService {
 
     @POST
     @Path("/addresses/")
-    public Response addAddress(Address address) {
+    public Response addAddress(AddressDTO address) {
         AddressValidator addressValidator = new AddressValidator(address);
         if (addressValidator.isValid()) {
-            Address newAddress = addressDao.createAddress(address.getId(), address);
+            Address newAddress = addressDao.createAddress(address);
             return Response.ok().type("application/xml").entity(newAddress).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity(addressValidator.getMessageError()).build();
@@ -34,11 +35,11 @@ public class AddressServiceImpl implements AddressService {
 
     @PUT
     @Path("/addresses/{id}/")
-    public Response updateAddress(@PathParam("id") Long id, Address address) {
+    public Response updateAddress(@PathParam("id") Long id, AddressDTO address) {
         AddressValidator addressValidator = new AddressValidator(address);
         if (addressValidator.isValid()) {
-            Address newAddress = addressDao.updateAddress(id, address);
-            return Response.ok().type("application/xml").entity(newAddress).build();
+            Address updatedAddress = addressDao.updateAddress(id, address);
+            return Response.ok().type("application/xml").entity(updatedAddress).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity(addressValidator.getMessageError()).build();
         }

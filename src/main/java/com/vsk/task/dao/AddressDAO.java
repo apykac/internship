@@ -1,13 +1,14 @@
 package com.vsk.task.dao;
 
 import com.vsk.task.model.Address;
+import com.vsk.task.model.dto.AddressDTO;
 
 public interface AddressDAO {
-    Address findAddressById(long id);
+    Address findAddressById(Long id);
 
-    Address updateAddress(long id, Address address);
+    Address updateAddress(Long id, AddressDTO addressDTO);
 
-    Address createAddress(long id, Address address);
+    Address createAddress(AddressDTO addressDTO);
 
-    void removeAddress(long id);
+    void removeAddress(Long id);
 }

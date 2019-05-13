@@ -1,7 +1,7 @@
 package com.vsk.task.utils;
 
-import com.vsk.task.model.BadUserResponse;
-import com.vsk.task.model.User;
+import com.vsk.task.model.dto.UserDTO;
+import com.vsk.task.response.BadUserResponse;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -12,9 +12,9 @@ public class UserValidator {
     private static final int MIN_SIZE_NAME = 2;
     private static final int CURRENT_YEAR = 2019;
     private final static String DATE_FORMAT = "dd-MM-yyyy";
-    private User user;
+    private UserDTO user;
 
-    public UserValidator(User user) {
+    public UserValidator(UserDTO user) {
         this.user = user;
     }
 
@@ -80,10 +80,10 @@ public class UserValidator {
     }
 
     public boolean isValid() {
-        return (isNameValid(user.getName()) &&
-                isNameValid(user.getSurname()) &&
-                isNameValid(user.getPatronymic()) &&
-                isDateBirthdayValid(user.getBirthday()) &&
+        return (isNameValid(user.getName()) &
+                isNameValid(user.getSurname()) &
+                isNameValid(user.getPatronymic()) &
+                isDateBirthdayValid(user.getBirthday()) &
                 isPassportNumberValid(user.getPassportNumber()));
     }
 

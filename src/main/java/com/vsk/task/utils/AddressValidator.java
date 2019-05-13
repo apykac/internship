@@ -2,15 +2,15 @@ package com.vsk.task.utils;
 
 import com.vsk.task.dao.UserDAO;
 import com.vsk.task.dao.UserHashMapDAO;
-import com.vsk.task.model.Address;
-import com.vsk.task.model.BadAddressResponse;
+import com.vsk.task.model.dto.AddressDTO;
+import com.vsk.task.response.BadAddressResponse;
 
 public class AddressValidator {
-    private Address address;
+    private AddressDTO address;
     private UserDAO userDao = UserHashMapDAO.getInstance();
     private BadAddressResponse badAddressResponse = new BadAddressResponse();
 
-    public AddressValidator(Address address) {
+    public AddressValidator(AddressDTO address) {
         this.address = address;
     }
 
@@ -41,7 +41,7 @@ public class AddressValidator {
     }
 
     public boolean isValid() {
-        return isExitUserId(address.getUserId()) &&
+        return isExitUserId(address.getUserId()) &
                 isCountryValid(address.getCountry());
     }
 
