@@ -32,7 +32,7 @@ public class UserValidator {
         }
         for (int i = 0; i < tempName.length(); i++) {
             if (!Character.isLetter(tempName.charAt(i))) {
-                badUserResponse.setNsp("В полях name, surname, patronymic встречаются символы отличные букв");
+                badUserResponse.setNsp("В полях name, surname, patronymic встречаются символы отличные от букв");
                 return false;
             }
         }
