@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.vsk.task</groupId>
-    <artifactId>cxf-jaxrs-blueprint</artifactId>
+    <artifactId>UserService</artifactId>
     <packaging>bundle</packaging>
     <version>1.0.0</version>
-    <name>Apache ServiceMix :: Examples :: CXF JAX-RS OSGI Blueprint</name>
-    <description>CXF Example using JAX-RS and Blueprint</description>
+    <name>UserService</name>
+    <description>Service for VSK intership</description>
 
     <dependencies>
         <dependency>
@@ -17,7 +17,6 @@
             <version>2.7.18</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -29,6 +28,14 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Description>${project.description}</Bundle-Description>
                     </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>

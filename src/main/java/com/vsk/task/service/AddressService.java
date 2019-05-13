@@ -4,12 +4,15 @@ import com.vsk.task.model.Address;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 
 
 public interface AddressService {
 
-    ArrayList<Address> getAddress(@PathParam("addressId") String addressId);
+    Address getAddress(@PathParam("id") Long id);
 
     Response addAddress(Address address);
+
+    Response updateAddress(@PathParam("id") Long id, Address address);
+
+    Response deleteAddress(@PathParam("id") Long id);
 }

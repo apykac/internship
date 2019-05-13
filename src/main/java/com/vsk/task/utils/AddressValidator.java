@@ -1,24 +1,25 @@
 package com.vsk.task.utils;
 
-import com.vsk.task.dao.UserDao;
+import com.vsk.task.dao.UserDAO;
+import com.vsk.task.dao.UserHashMapDAO;
 import com.vsk.task.model.Address;
 import com.vsk.task.model.BadAddressResponse;
 
 public class AddressValidator {
     private Address address;
-    UserDao userDao = new UserDao();
-    BadAddressResponse badAddressResponse;
+    private UserDAO userDao = UserHashMapDAO.getInstance();
+    private BadAddressResponse badAddressResponse = new BadAddressResponse();
 
     public AddressValidator(Address address) {
         this.address = address;
     }
 
-    private boolean isExitUserId(long userId) {
-        if (userDao.getUser(userId) != null) {
-            return true;
+    private boolean isExitUserId(Long userId) {
+        if (userDao.findUserById(userId) == null) {
+            badAddressResponse.setUserId("Ошибка, несуществующий Id пользователя");
+            return false;
         }
-        badAddressResponse.setUserId("Ошибка, несуществующий Id пользователя");
-        return false;
+        return true;
     }
 
     private boolean isCountryValid(String country) {
@@ -40,11 +41,8 @@ public class AddressValidator {
     }
 
     public boolean isValid() {
-        badAddressResponse = new BadAddressResponse();
-        if (isExitUserId(address.getUserId()) & isCountryValid(address.getCountry())) {
-            return true;
-        }
-        return false;
+        return isExitUserId(address.getUserId()) &&
+                isCountryValid(address.getCountry());
     }
 
     public BadAddressResponse getMessageError() {

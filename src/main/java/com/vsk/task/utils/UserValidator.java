@@ -13,13 +13,14 @@ public class UserValidator {
     private static final int CURRENT_YEAR = 2019;
     private final static String DATE_FORMAT = "dd-MM-yyyy";
     private User user;
-    public  UserValidator(User user){
-        this.user=user;
+
+    public UserValidator(User user) {
+        this.user = user;
     }
 
-    private BadUserResponse badUserResponse;
+    private BadUserResponse badUserResponse = new BadUserResponse();
 
-    private  boolean isNameValid(String name) {
+    private boolean isNameValid(String name) {
         if (name == null) {
             badUserResponse.setNsp("В полях name, surname, patronymic присутствует пустое значение");
             return false;
@@ -35,11 +36,10 @@ public class UserValidator {
                 return false;
             }
         }
-        badUserResponse.setNsp("OK!");
         return true;
     }
 
-    private  boolean isDateBirthdayValid(String birthday) {
+    private boolean isDateBirthdayValid(String birthday) {
         if (birthday == null) {
             badUserResponse.setBirthday("Введено пустое значение для даты рождения");
             return false;
@@ -61,18 +61,18 @@ public class UserValidator {
         return true;
     }
 
-    private  boolean isPassportNumberValid(String passport){
-        if(passport==null){
-            badUserResponse.setBirthday("Пустое значение паспортных данных");
+    private boolean isPassportNumberValid(String passport) {
+        if (passport == null) {
+            badUserResponse.setPassportNumber("Пустое значение паспортных данных");
             return false;
         }
-        if(passport.length()!=10){
-            badUserResponse.setBirthday("Номер пасспорта должен содержать ровно 10 цифр");
+        if (passport.length() != 10) {
+            badUserResponse.setPassportNumber("Номер пасспорта должен содержать ровно 10 цифр");
             return false;
         }
-        for(int i=0; i<passport.length();i++){
-            if (!Character.isDigit(passport.charAt(i))){
-                badUserResponse.setBirthday("В номере пасспорта присутствует символы отличные от цифр");
+        for (int i = 0; i < passport.length(); i++) {
+            if (!Character.isDigit(passport.charAt(i))) {
+                badUserResponse.setPassportNumber("В номере пасспорта присутствует символы отличные от цифр");
                 return false;
             }
         }
@@ -80,14 +80,14 @@ public class UserValidator {
     }
 
     public boolean isValid() {
-        badUserResponse = new BadUserResponse();
-        return (isNameValid(user.getName()) &
-                isNameValid(user.getSurname()) &
-                isNameValid(user.getPatronymic()) &
-                isDateBirthdayValid(user.getBirthday()) &
+        return (isNameValid(user.getName()) &&
+                isNameValid(user.getSurname()) &&
+                isNameValid(user.getPatronymic()) &&
+                isDateBirthdayValid(user.getBirthday()) &&
                 isPassportNumberValid(user.getPassportNumber()));
     }
-    public BadUserResponse getErrorMessage(){
+
+    public BadUserResponse getErrorMessage() {
         return badUserResponse;
     }
 }

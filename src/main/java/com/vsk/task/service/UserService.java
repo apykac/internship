@@ -7,11 +7,11 @@ import javax.ws.rs.core.Response;
 
 public interface UserService {
 
-    User getUser(@PathParam("id") String id);
+    User getUser(@PathParam("id") Long id);
 
-    Response updateUser(User user);
+    Response updateUser(@PathParam("id") Long id, User user);
 
     Response addUser(User user);
 
-    Response deleteUser(@PathParam("id") String id);
+    Response deleteUser(@PathParam("id") Long id);
 }
