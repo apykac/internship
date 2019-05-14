@@ -3,42 +3,18 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.vsk.task</groupId>
-    <artifactId>UserService</artifactId>
-    <packaging>bundle</packaging>
-    <version>1.0.0</version>
-    <name>UserService</name>
-    <description>Service for VSK intership</description>
+    <groupId>internship</groupId>
+    <artifactId>spring-2019</artifactId>
+    <packaging>pom</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle-jaxrs</artifactId>
-            <version>2.7.18</version>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Description>${project.description}</Bundle-Description>
-                    </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <version>1.0.0</version>
+    <name>Spring-2019</name>
+    <description>Service for VSK internship</description>
+
+    <modules>
+        <module>user-service</module>
+        <module>address-service</module>
+    </modules>
+
 
 </project>
