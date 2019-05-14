@@ -14,6 +14,10 @@ public class AddressHashMapDAO implements AddressDAO {
     public static AddressDAO getInstance() {
         if (dao == null) {
             dao = new AddressHashMapDAO();
+            AddressDTO vanya = new AddressDTO(1,"Russia","Promyshlennaya","Krasnoarmeyskaya","2","2");
+            dao.createAddress(vanya);
+            AddressDTO pushkin = new AddressDTO(2,"Russia","Saint Petersburg","","","");
+            dao.createAddress(pushkin);
         }
         return dao;
     }
