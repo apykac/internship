@@ -12,9 +12,8 @@
     <description>Service for VSK internship</description>
 
     <modules>
-        <module>user-service</module>
-        <module>address-service</module>
+        <module>user</module>
+        <module>address</module>
     </modules>
-
 
 </project>
