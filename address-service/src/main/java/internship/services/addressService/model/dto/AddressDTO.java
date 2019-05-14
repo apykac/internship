@@ -58,4 +58,15 @@ public class AddressDTO {
     public void setApartmentNumber(String apartmentNumber) {
         this.apartmentNumber = apartmentNumber;
     }
+
+    public AddressDTO(long userId, String country, String city, String street, String houseNumber, String apartmentNumber) {
+        this.userId = userId;
+        this.country = country;
+        this.city = city;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.apartmentNumber = apartmentNumber;
+    }
+
+    public AddressDTO(){}
 }
