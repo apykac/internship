@@ -14,15 +14,10 @@ public class UserHashMapDAO implements UserDAO {
     public static UserDAO getInstance() {
         if (dao == null) {
             dao = new UserHashMapDAO();
-            UserDTO vanya = new UserDTO();
-            vanya.setName("Ivan");
-            vanya.setSurname("Rybachenko");
-            vanya.setBirthday("15.05.99");
-            vanya.setPassportNumber("0000-000000");
-            vanya.setPatronymic("Alexandrovich");
+            UserDTO vanya = new UserDTO("Ivan", "Rybachenko", "Alexandrovich", "15.05.1999", "");
             dao.createUser(vanya);
-            dao.createUser(vanya);
-            dao.createUser(vanya);
+            UserDTO pushkin = new UserDTO("Alexandr", "Pushkin", "Sergeevich", "26.05.1799", "");
+            dao.createUser(pushkin);
         }
         return dao;
     }
