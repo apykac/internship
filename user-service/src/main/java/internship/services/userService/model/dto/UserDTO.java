@@ -49,4 +49,13 @@ public class UserDTO {
     public void setPassportNumber(String passportNumber) {
         this.passportNumber = passportNumber;
     }
+
+    public UserDTO(String name, String surname, String patronymic, String birthday, String passportNumber) {
+        this.name = name;
+        this.surname = surname;
+        this.patronymic = patronymic;
+        this.birthday = birthday;
+        this.passportNumber = passportNumber;
+    }
+    public UserDTO(){}
 }
