@@ -10,7 +10,7 @@ import internship.services.userService.utils.UserValidator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
-@Path("/userservice")
+@Path("/")
 public class UserServiceImpl implements UserService {
 
     private UserDAO userDao = UserHashMapDAO.getInstance();
@@ -19,6 +19,7 @@ public class UserServiceImpl implements UserService {
     @Path("/users/{id}/")
     @Produces("application/xml")
     public User getUser(@PathParam("id") Long id) {
+        System.out.println("get user "+id);
         return userDao.findUserById(id);
     }
 
