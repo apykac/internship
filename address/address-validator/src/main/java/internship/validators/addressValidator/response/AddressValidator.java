@@ -1,12 +1,14 @@
 package internship.validators.addressValidator.response;
 
 import internship.dao.userDAO.UserDAO;
+import internship.dao.userDAO.UserDatabaseDAO;
 import internship.dao.userDAO.UserHashMapDAO;
 import internship.models.addressModel.dto.AddressDTO;
 
 public class AddressValidator {
 	private AddressDTO address;
 	private UserDAO userDao = UserHashMapDAO.getInstance();
+    private UserDAO userDbDao = new UserDatabaseDAO();
 	private BadAddressResponse badAddressResponse = new BadAddressResponse();
 
 	public AddressValidator(AddressDTO address) {
@@ -14,7 +16,7 @@ public class AddressValidator {
 	}
 
 	private boolean isExitUserId(Long userId) {
-		if (userDao.findUserById(userId) == null) {
+        if (userDbDao.findUserById(userId) == null) {
 			badAddressResponse.setUserId("Ошибка, несуществующий Id пользователя");
 			return false;
 		}

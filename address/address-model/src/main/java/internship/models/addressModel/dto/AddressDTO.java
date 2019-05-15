@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class AddressDTO {
     private long userId;
     private String country;
+    private String region;
     private String city;
     private String street;
     private String houseNumber;
@@ -57,6 +58,14 @@ public class AddressDTO {
 
     public void setApartmentNumber(String apartmentNumber) {
         this.apartmentNumber = apartmentNumber;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public AddressDTO(long userId, String country, String city, String street, String houseNumber, String apartmentNumber) {

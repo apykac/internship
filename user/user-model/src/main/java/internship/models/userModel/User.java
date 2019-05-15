@@ -9,7 +9,8 @@ public class User {
     private String surname;
     private String patronymic;
     private String birthday;
-    private String passportNumber;
+    private Long passportNumber;
+    private Long income;
 
     public long getId() {
         return id;
@@ -51,11 +52,19 @@ public class User {
         this.birthday = birthday;
     }
 
-    public String getPassportNumber() {
+    public Long getPassportNumber() {
         return passportNumber;
     }
 
-    public void setPassportNumber(String passportNumber) {
+    public void setPassportNumber(Long passportNumber) {
         this.passportNumber = passportNumber;
+    }
+
+    public Long getIncome() {
+        return income;
+    }
+
+    public void setIncome(Long income) {
+        this.income = income;
     }
 }

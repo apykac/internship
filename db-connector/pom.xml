@@ -3,16 +3,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
+        <artifactId>spring-2019</artifactId>
         <groupId>internship</groupId>
-        <artifactId>address</artifactId>
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>address-dao</artifactId>
+    <artifactId>db-connector</artifactId>
     <packaging>bundle</packaging>
-    <name>AddressDAO</name>
-    <description>AddressDAO for VSK internship</description>
+    <name>DBConnector</name>
+    <description>DBConnector for VSK internship</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.5</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -25,12 +33,6 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Description>${project.description}</Bundle-Description>
-                        <Import-Package>
-                            internship.models.addressModel,
-                            internship.models.addressModel.dto,
-                            *
-                        </Import-Package>
-                        <Export-Package>internship.dao.addressDAO</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -45,18 +47,5 @@
             </plugin>
         </plugins>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>internship</groupId>
-            <artifactId>address-model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>internship</groupId>
-            <artifactId>db-connector</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-
 
 </project>

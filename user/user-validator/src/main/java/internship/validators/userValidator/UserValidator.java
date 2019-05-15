@@ -61,17 +61,17 @@ public class UserValidator {
         return true;
     }
 
-    private boolean isPassportNumberValid(String passport) {
+    private boolean isPassportNumberValid(Long passport) {
         if (passport == null) {
             badUserResponse.setPassportNumber("Пустое значение паспортных данных");
             return false;
         }
-        if (passport.length() != 10) {
+        if (passport.toString().length() != 10) {
             badUserResponse.setPassportNumber("Номер пасспорта должен содержать ровно 10 цифр");
             return false;
         }
-        for (int i = 0; i < passport.length(); i++) {
-            if (!Character.isDigit(passport.charAt(i))) {
+        for (int i = 0; i < passport.toString().length(); i++) {
+            if (!Character.isDigit(passport.toString().charAt(i))) {
                 badUserResponse.setPassportNumber("В номере пасспорта присутствует символы отличные от цифр");
                 return false;
             }

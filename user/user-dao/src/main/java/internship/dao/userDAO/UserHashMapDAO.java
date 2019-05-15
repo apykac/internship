@@ -14,9 +14,9 @@ public class UserHashMapDAO implements UserDAO {
     public static UserDAO getInstance() {
         if (dao == null) {
             dao = new UserHashMapDAO();
-			UserDTO vanya = new UserDTO("Ivan", "Rybachenko", "Alexandrovich", "15-05-1999", "");
+            UserDTO vanya = new UserDTO("Ivan", "Rybachenko", "Alexandrovich", "15-05-1999", 1234567890L, 20000L);
             dao.createUser(vanya);
-			UserDTO pushkin = new UserDTO("Alexandr", "Pushkin", "Sergeevich", "26-05-1799", "");
+            UserDTO pushkin = new UserDTO("Alexandr", "Pushkin", "Sergeevich", "26-05-1799", 1234567890L, 20000L);
             dao.createUser(pushkin);
         }
         return dao;

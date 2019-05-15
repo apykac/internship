@@ -8,7 +8,8 @@ public class UserDTO {
     private String surname;
     private String patronymic;
     private String birthday;
-    private String passportNumber;
+    private Long passportNumber;
+    private Long income;
 
     public String getName() {
         return name;
@@ -42,20 +43,29 @@ public class UserDTO {
         this.birthday = birthday;
     }
 
-    public String getPassportNumber() {
+    public Long getPassportNumber() {
         return passportNumber;
     }
 
-    public void setPassportNumber(String passportNumber) {
+    public void setPassportNumber(Long passportNumber) {
         this.passportNumber = passportNumber;
     }
 
-    public UserDTO(String name, String surname, String patronymic, String birthday, String passportNumber) {
+    public Long getIncome() {
+        return income;
+    }
+
+    public void setIncome(Long income) {
+        this.income = income;
+    }
+
+    public UserDTO(String name, String surname, String patronymic, String birthday, Long passportNumber, Long income) {
         this.name = name;
         this.surname = surname;
         this.patronymic = patronymic;
         this.birthday = birthday;
         this.passportNumber = passportNumber;
+        this.income = income;
     }
     public UserDTO(){}
 }

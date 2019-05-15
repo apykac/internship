@@ -7,6 +7,7 @@ public class Address {
     private long id;
     private long userId;
     private String country;
+    private String region;
     private String city;
     private String street;
     private String houseNumber;
@@ -66,5 +67,13 @@ public class Address {
 
     public void setApartmentNumber(String apartmentNumber) {
         this.apartmentNumber = apartmentNumber;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 }
