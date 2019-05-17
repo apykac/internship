@@ -15,6 +15,7 @@
         <module>user</module>
         <module>address</module>
         <module>db-connector</module>
+        <module>feature</module>
     </modules>
 
 </project>
