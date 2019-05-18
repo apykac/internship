@@ -1,6 +1,8 @@
 package internship.restapi;
 
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -15,6 +17,7 @@ import javax.jms.TextMessage;
 public class UserServiceImpl {
 
     private Connection connection;
+    private Logger log = LoggerFactory.getLogger(this.getClass());
     int num = 1;
 
     public UserServiceImpl() throws JMSException {
@@ -30,6 +33,7 @@ public class UserServiceImpl {
     @Path("/user")
     public String getUser() {
         System.out.println("get user");
+        log.info("Get user invoked.");
         produceMessage(num);
         num++;
         return "Hello!";
