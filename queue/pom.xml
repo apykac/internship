@@ -10,10 +10,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>queue</artifactId>
+    <packaging>bundle</packaging>
 
-    <build>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>5.12.3</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.osgi/osgi.core -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.core</artifactId>
+            <version>4.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+
+<build>
         <plugins>
-            <!--
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -23,11 +39,10 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Description>${project.description}</Bundle-Description>
                         <Export-Package>internship.vsk</Export-Package>
-                        <Bundle-Activator></Bundle-Activator>
+                        <Bundle-Activator>internship.queue.Main</Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
