@@ -1,4 +1,9 @@
-package internship.queue;
+package internship.restapi;
+
+import org.apache.activemq.spring.ActiveMQConnectionFactory;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -7,23 +12,27 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.activemq.spring.ActiveMQConnectionFactory;
-
-public class Producer {
+public class UserServiceImpl {
 
     private Connection connection;
+    int num = 1;
 
-    public Producer() throws JMSException {
-        // Create a ConnectionFactory
+    public UserServiceImpl() throws JMSException {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
         connectionFactory.setBrokerURL("tcp://localhost:61617");
 
         connection = connectionFactory.createConnection();
         connection.start();
+    }
 
-        // Clean up
-//      connection.close();
 
+    @GET
+    @Path("/user")
+    public String getUser() {
+        System.out.println("get user");
+        produceMessage(num);
+        num++;
+        return "Hello!";
     }
 
     public void produceMessage(int x) {
@@ -52,4 +61,5 @@ public class Producer {
             e.printStackTrace();
         }
     }
+
 }

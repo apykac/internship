@@ -11,14 +11,8 @@ public class Main implements BundleActivator {
         broker.addConnector("tcp://localhost:61617");
         broker.start();
 
-        Producer producer = new Producer();
+
         Consumer consumer = new Consumer();
-        int x = 0;
-        while(true) {
-            Thread.sleep(2000);
-            producer.produceMessage(x);
-            x++;
-        }
     }
 
     @Override
