@@ -12,6 +12,7 @@
     <modules>
         <module>queue</module>
         <module>rest-api</module>
+        <module>feature</module>
     </modules>
 
 
