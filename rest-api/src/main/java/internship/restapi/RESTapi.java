@@ -14,15 +14,17 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-public class UserServiceImpl {
+public class RESTapi {
 
     private Connection connection;
     private Logger log = LoggerFactory.getLogger(this.getClass());
     int num = 1;
 
-    public UserServiceImpl() throws JMSException {
+    public RESTapi() throws JMSException {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-        connectionFactory.setBrokerURL("tcp://localhost:61617");
+        connectionFactory.setBrokerURL("tcp://localhost:61616");
+        connectionFactory.setUserName("karaf");
+        connectionFactory.setPassword("karaf");
 
         connection = connectionFactory.createConnection();
         connection.start();
@@ -40,6 +42,7 @@ public class UserServiceImpl {
     }
 
     public void produceMessage(int x) {
+        log.info("Sending message. x="+x);
         try {
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
