@@ -5,7 +5,7 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
-@Command(scope = "user", name = "dao", description = "Switch to DB DAO.")
+@Command(scope = "user", name ="dao", description = "Switch to DB DAO.")
 public class DAOSwitchCommand extends OsgiCommandSupport {
 
     @Argument(index = 0, name = "dao", description = "The new dao to be set. Could be either 'db' or 'hm'.", required = true, multiValued = false)
