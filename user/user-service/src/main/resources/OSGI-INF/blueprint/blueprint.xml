@@ -18,8 +18,18 @@ http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/ja
         <command>
             <action class="internship.services.userService.HelloCommand"/>
         </command>
+        <command>
+            <action class="internship.services.userService.DAOSwitchCommand"/>
+        </command>
     </command-bundle>
 
-    <bean id="userSvc" class=" internship.services.userService.UserServiceImpl"/>
+    <bean id="userSvc" class=" internship.services.userService.UserServiceImpl"
+        scope="singleton"/>
+
+    <bean id="daoSwitch" class="internship.services.userService.DAOSwitchCommand">
+        <property name="user">
+            <ref component-id="userSvc"/>
+        </property>
+    </bean>
 
 </blueprint>
