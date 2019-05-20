@@ -5,13 +5,13 @@ import internship.validators.userValidator.response.BadUserResponse;
 
 public interface IUserValidator {
 
-    boolean isNameValid(String name);
+	boolean isNameValid(String name);
 
-    boolean isDateBirthdayValid(String birthday);
+	boolean isDateBirthdayValid(String birthday);
 
-    boolean isPassportNumberValid(Long passport);
+	boolean isPassportNumberValid(Long passport);
 
-    boolean isValid(User user);
+	boolean isValid(User user);
 
-    BadUserResponse getErrorMessage();
+	BadUserResponse getErrorMessage();
 }

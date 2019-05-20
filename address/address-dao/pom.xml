@@ -26,6 +26,9 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Description>${project.description}</Bundle-Description>
                         <Bundle-Activator>internship.dao.addressDAO.Activator</Bundle-Activator>
+                        <Export-Package>
+                            internship.dao.addressDAO
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>

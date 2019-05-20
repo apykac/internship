@@ -57,27 +57,12 @@ public class UserDatabaseDAO implements UserDAO {
             PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE users " +
                     "SET name = ?, surname = ?, patronymic = ?, birthday = ?, \"passportNumber\" = ?, income = ? " +
                     "WHERE id = ? RETURNING id, name, surname, patronymic, birthday, \"passportNumber\", income");
-            preparedStatement.setString(1, user.getName());
-            preparedStatement.setString(2, user.getSurname());
-            preparedStatement.setString(3, user.getPatronymic());
-            preparedStatement.setString(4, user.getBirthday());
-            preparedStatement.setLong(5, user.getPassportNumber());
-            preparedStatement.setLong(6, user.getIncome());
+            setStatement(user, preparedStatement);
             preparedStatement.setLong(7, id);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                user.setId(resultSet.getLong("id"));
-                user.setName(resultSet.getString("name"));
-                user.setSurname(resultSet.getString("surname"));
-                user.setPatronymic(resultSet.getString("patronymic"));
-                user.setBirthday(resultSet.getString("birthday"));
-                user.setPassportNumber(resultSet.getLong("passportNumber"));
-                user.setIncome(resultSet.getLong("income"));
-
-                return user;
-            }
+            User userFromResultSet = getResultSet(preparedStatement.executeQuery(), user);
             dbConnection.close();
+            return userFromResultSet;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -93,26 +78,11 @@ public class UserDatabaseDAO implements UserDAO {
             PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO users" +
                     "(name, surname, patronymic, birthday, \"passportNumber\", income) " +
                     "VALUES (?, ?, ?, ?, ?, ?) RETURNING id, name, surname, patronymic, birthday, \"passportNumber\", income");
-            preparedStatement.setString(1, user.getName());
-            preparedStatement.setString(2, user.getSurname());
-            preparedStatement.setString(3, user.getPatronymic());
-            preparedStatement.setString(4, user.getBirthday());
-            preparedStatement.setLong(5, user.getPassportNumber());
-            preparedStatement.setLong(6, user.getIncome());
+            setStatement(user, preparedStatement);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                user.setId(resultSet.getLong("id"));
-                user.setName(resultSet.getString("name"));
-                user.setSurname(resultSet.getString("surname"));
-                user.setPatronymic(resultSet.getString("patronymic"));
-                user.setBirthday(resultSet.getString("birthday"));
-                user.setPassportNumber(resultSet.getLong("passportNumber"));
-                user.setIncome(resultSet.getLong("income"));
-
-                return user;
-            }
+            User userFromResultSet = getResultSet(preparedStatement.executeQuery(), user);
             dbConnection.close();
+            return userFromResultSet;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -133,6 +103,30 @@ public class UserDatabaseDAO implements UserDAO {
         } catch (SQLException | ConnectException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private User getResultSet(ResultSet resultSet, User user) throws SQLException {
+        if (resultSet.next()) {
+            user.setId(resultSet.getLong("id"));
+            user.setName(resultSet.getString("name"));
+            user.setSurname(resultSet.getString("surname"));
+            user.setPatronymic(resultSet.getString("patronymic"));
+            user.setBirthday(resultSet.getString("birthday"));
+            user.setPassportNumber(resultSet.getLong("passportNumber"));
+            user.setIncome(resultSet.getLong("income"));
+
+            return user;
+        } else
+            return null;
+    }
+
+    private void setStatement(User user, PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.setString(1, user.getName());
+        preparedStatement.setString(2, user.getSurname());
+        preparedStatement.setString(3, user.getPatronymic());
+        preparedStatement.setString(4, user.getBirthday());
+        preparedStatement.setLong(5, user.getPassportNumber());
+        preparedStatement.setLong(6, user.getIncome());
     }
 
     @Override

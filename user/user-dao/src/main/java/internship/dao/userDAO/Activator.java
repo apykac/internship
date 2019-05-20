@@ -10,38 +10,38 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 
-    private ServiceRegistration serviceRegistration;
-    private ServiceTracker userDBConnectorTracker;
-    private BundleContext context;
-    private final UserDatabaseDAO databaseDAO = new UserDatabaseDAO();
+	private ServiceRegistration serviceRegistration;
+	private ServiceTracker userDBConnectorTracker;
+	private BundleContext context;
+	private final UserDatabaseDAO databaseDAO = new UserDatabaseDAO();
 
-    public void start(BundleContext bundleContext) throws Exception {
-        this.context = bundleContext;
-        serviceRegistration = context.registerService(UserDAO.class.getName(), databaseDAO, null);
-        userDBConnectorTracker = new ServiceTracker(context, IConnector.class.getName(), this);
-        userDBConnectorTracker.open();
-    }
+	public void start(BundleContext bundleContext) {
+		this.context = bundleContext;
+		serviceRegistration = context.registerService(UserDAO.class.getName(), databaseDAO, null);
+		userDBConnectorTracker = new ServiceTracker(context, IConnector.class.getName(), this);
+		userDBConnectorTracker.open();
+	}
 
-    public void stop(BundleContext bundleContext) throws Exception {
-        serviceRegistration.unregister();
-        userDBConnectorTracker.close();
-    }
+	public void stop(BundleContext bundleContext) {
+		serviceRegistration.unregister();
+		userDBConnectorTracker.close();
+	}
 
-    @Override
-    public Object addingService(ServiceReference serviceReference) {
-        final Object trackedService = context.getService(serviceReference);
-        if (trackedService instanceof IConnector) {
-            databaseDAO.setConnector((IConnector) trackedService);
-        }
+	@Override
+	public Object addingService(ServiceReference serviceReference) {
+		final Object trackedService = context.getService(serviceReference);
+		if (trackedService instanceof IConnector) {
+			databaseDAO.setConnector((IConnector) trackedService);
+		}
 
-        return trackedService;
-    }
+		return trackedService;
+	}
 
-    @Override
-    public void modifiedService(ServiceReference serviceReference, Object service) {
-    }
+	@Override
+	public void modifiedService(ServiceReference serviceReference, Object service) {
+	}
 
-    @Override
-    public void removedService(ServiceReference serviceReference, Object service) {
-    }
+	@Override
+	public void removedService(ServiceReference serviceReference, Object service) {
+	}
 }

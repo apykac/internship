@@ -4,13 +4,13 @@ import internship.models.addressModel.Address;
 
 public interface AddressDAO {
 
-    Address findAddressById(Long id);
+	Address findAddressById(Long id);
 
-    Address updateAddress(Long id, Address address);
+	Address updateAddress(Long id, Address address);
 
-    Address createAddress(Address address);
+	Address createAddress(Address address);
 
-    void removeAddress(Long id);
+	void removeAddress(Long id);
 
-    boolean isConnectorUp();
+	boolean isConnectorUp();
 }

@@ -5,14 +5,14 @@ import internship.validators.addressValidator.response.BadAddressResponse;
 
 public interface IAddressValidator {
 
-    boolean isExitUserId(Long userId);
+	boolean isExitUserId(Long userId);
 
-    boolean isCountryValid(String country);
+	boolean isCountryValid(String country);
 
-    boolean isValid(Address address);
+	boolean isValid(Address address);
 
-    BadAddressResponse getMessageError();
+	BadAddressResponse getMessageError();
 
-    boolean isUserDAOUp();
+	boolean isUserDAOUp();
 
 }

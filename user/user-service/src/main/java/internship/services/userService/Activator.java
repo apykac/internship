@@ -13,59 +13,59 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 
-    private BundleContext context;
-    private ServiceTracker validationTracker;
-    private ServiceTracker daoTracker;
-    private Server server = null;
-    private final UserServiceImpl userService = new UserServiceImpl();
+	private BundleContext context;
+	private ServiceTracker validationTracker;
+	private ServiceTracker daoTracker;
+	private Server server = null;
+	private final UserServiceImpl userService = new UserServiceImpl();
 
-    @Override
-    public void start(BundleContext bundleContext) throws Exception {
-        this.context = bundleContext;
+	@Override
+	public void start(BundleContext bundleContext) {
+		this.context = bundleContext;
 
-        validationTracker = new ServiceTracker(context, IUserValidator.class.getName(), this);
-        daoTracker = new ServiceTracker(context, UserDAO.class.getName(), this);
-        validationTracker.open();
-        daoTracker.open();
+		validationTracker = new ServiceTracker(context, IUserValidator.class.getName(), this);
+		daoTracker = new ServiceTracker(context, UserDAO.class.getName(), this);
+		validationTracker.open();
+		daoTracker.open();
 
-        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setResourceClasses(userService.getClass());
-        sf.setResourceProvider(userService.getClass(), new SingletonResourceProvider(userService));
-        sf.setAddress("/userservice");
-        server = sf.create();
-    }
+		JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+		sf.setResourceClasses(userService.getClass());
+		sf.setResourceProvider(userService.getClass(), new SingletonResourceProvider(userService));
+		sf.setAddress("/userservice");
+		server = sf.create();
+	}
 
-    @Override
-    public void stop(BundleContext bundleContext) throws Exception {
-        if (server != null) {
-            server.stop();
-            server.destroy();
-            server = null;
-        }
-        validationTracker.close();
-        daoTracker.close();
-        this.context = null;
-    }
+	@Override
+	public void stop(BundleContext bundleContext) {
+		if (server != null) {
+			server.stop();
+			server.destroy();
+			server = null;
+		}
+		validationTracker.close();
+		daoTracker.close();
+		this.context = null;
+	}
 
-    @Override
-    public Object addingService(ServiceReference serviceReference) {
-        final Object trackedService = context.getService(serviceReference);
+	@Override
+	public Object addingService(ServiceReference serviceReference) {
+		final Object trackedService = context.getService(serviceReference);
 
-        if (trackedService instanceof IUserValidator) {
-            userService.setUserValidator((IUserValidator) trackedService);
-        }
-        if (trackedService instanceof UserDAO) {
-            userService.setUserDAO((UserDAO) trackedService);
-        }
+		if (trackedService instanceof IUserValidator) {
+			userService.setUserValidator((IUserValidator) trackedService);
+		}
+		if (trackedService instanceof UserDAO) {
+			userService.setUserDAO((UserDAO) trackedService);
+		}
 
-        return trackedService;
-    }
+		return trackedService;
+	}
 
-    @Override
-    public void modifiedService(ServiceReference serviceReference, Object service) {
-    }
+	@Override
+	public void modifiedService(ServiceReference serviceReference, Object service) {
+	}
 
-    @Override
-    public void removedService(ServiceReference serviceReference, Object service) {
-    }
+	@Override
+	public void removedService(ServiceReference serviceReference, Object service) {
+	}
 }

@@ -48,6 +48,10 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Description>${project.description}</Bundle-Description>
                         <Bundle-Activator>internship.services.addressService.Activator</Bundle-Activator>
+                        <Export-Package>
+                            org.apache.cxf.endpoint,
+                            org.apache.cxf.jaxrs
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
