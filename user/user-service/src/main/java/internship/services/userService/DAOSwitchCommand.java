@@ -11,6 +11,14 @@ public class DAOSwitchCommand extends OsgiCommandSupport {
     @Argument(index = 0, name = "dao", description = "The new dao to be set. Could be either 'db' or 'hm'.", required = true, multiValued = false)
     String dao;
 
+    public DAOSwitchCommand() {
+
+    }
+
+    public DAOSwitchCommand(UserServiceImpl user) {
+        this.user = user;
+    }
+
     public void setUser(UserServiceImpl user) {
         this.user = user;
     }
@@ -18,6 +26,7 @@ public class DAOSwitchCommand extends OsgiCommandSupport {
     private UserServiceImpl user;
     @Override
     protected Object doExecute() throws Exception {
+        System.out.println("Version 1");
         if (dao.equals("db")) {
             System.out.println("Switching to DB.");
             user.setDao(new UserDatabaseDAO());
