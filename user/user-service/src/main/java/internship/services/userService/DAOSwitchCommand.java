@@ -1,6 +1,7 @@
 package internship.services.userService;
 
 import internship.dao.userDAO.UserDatabaseDAO;
+import internship.dao.userDAO.UserHashMapDAO;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -12,7 +13,7 @@ public class DAOSwitchCommand extends OsgiCommandSupport {
     String dao;
 
     public DAOSwitchCommand() {
-
+        this.user = this.user;
     }
 
     public DAOSwitchCommand(UserServiceImpl user) {
@@ -28,8 +29,12 @@ public class DAOSwitchCommand extends OsgiCommandSupport {
     protected Object doExecute() throws Exception {
         System.out.println("Version 1");
         if (dao.equals("db")) {
-            System.out.println("Switching to DB.");
+            System.out.println("Switching to Postgres DataBase.");
             user.setDao(new UserDatabaseDAO());
+        }
+        else if (dao.equals("hm")){
+            System.out.println("Switching to HashMap");
+            user.setDao(UserHashMapDAO.getInstance());
         }
         else{
             System.out.println("Wrong dao. Could be either 'db' or 'hm'.");
