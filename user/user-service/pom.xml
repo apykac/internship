@@ -16,6 +16,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.shell</groupId>
+            <artifactId>org.apache.karaf.shell.console</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-bundle-jaxrs</artifactId>
             <version>2.7.18</version>
@@ -54,6 +64,7 @@
                             internship.validators.userValidator.response,
                             *
                         </Import-Package>
+                        <Bundle-Activator>internship.services.userService.Activator</Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>
