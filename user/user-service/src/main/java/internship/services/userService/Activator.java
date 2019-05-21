@@ -10,6 +10,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 
@@ -18,9 +20,11 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 	private ServiceTracker daoTracker;
 	private Server server = null;
 	private final UserServiceImpl userService = new UserServiceImpl();
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Override
 	public void start(BundleContext bundleContext) {
+		log.info("Starting...");
 		this.context = bundleContext;
 
 		validationTracker = new ServiceTracker(context, IUserValidator.class.getName(), this);
@@ -33,10 +37,12 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 		sf.setResourceProvider(userService.getClass(), new SingletonResourceProvider(userService));
 		sf.setAddress("/userservice");
 		server = sf.create();
+		log.info("Started.");
 	}
 
 	@Override
 	public void stop(BundleContext bundleContext) {
+		log.info("Stopping...");
 		if (server != null) {
 			server.stop();
 			server.destroy();
@@ -45,6 +51,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 		validationTracker.close();
 		daoTracker.close();
 		this.context = null;
+		log.info("Stopped");
 	}
 
 	@Override

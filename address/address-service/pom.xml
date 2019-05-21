@@ -18,7 +18,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-bundle</artifactId>
-            <version>3.0.0-milestone2</version>
         </dependency>
         <dependency>
             <groupId>internship</groupId>
