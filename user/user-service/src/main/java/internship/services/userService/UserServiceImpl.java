@@ -32,15 +32,18 @@ public class UserServiceImpl implements UserService {
 	public Response getUser(@PathParam("id") Long id) {
 		log.info("GET|GetUser invoked. userId="+id);
 
-		if (isServicesUp())
+		if (isServicesUp()) {
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(userServiceResponse).build();
+		}
 
 		log.info("LOG get user " + id);
 		User userFromDB = userDAO.findUserById(id);
-		if (userFromDB == null)
+		if (userFromDB == null) {
 			return Response.status(Response.Status.NO_CONTENT).entity("Пользователь с данным ID не найден").build();
-		else
+		}
+		else {
 			return Response.ok().type("application/xml").entity(userFromDB).build();
+		}
 	}
 
 	@PUT
