@@ -15,26 +15,25 @@
     <description>UserService for VSK internship</description>
 
     <dependencies>
+        <!-- LOGGING -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.26</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j13</artifactId>
-            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.logging</groupId>
             <artifactId>pax-logging-api</artifactId>
-            <version>1.10.1</version>
         </dependency>
+        <!-- CXF -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-bundle</artifactId>
-            <version>3.0.0-milestone2</version>
         </dependency>
+        <!-- MODULES -->
         <dependency>
             <groupId>internship</groupId>
             <artifactId>user-model</artifactId>
@@ -63,6 +62,10 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Description>${project.description}</Bundle-Description>
                         <Bundle-Activator>internship.services.userService.Activator</Bundle-Activator>
+                        <Import-Package>
+                            ${logging.import-package},
+                            *
+                        </Import-Package>
                         <Export-Package>
                             org.apache.cxf.endpoint,
                             org.apache.cxf.jaxrs
