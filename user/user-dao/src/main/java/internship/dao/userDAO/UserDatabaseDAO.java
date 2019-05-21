@@ -38,7 +38,7 @@ public class UserDatabaseDAO implements UserDAO {
                         resultSet.getString("patronymic"),
                         resultSet.getString("birthday"),
                         resultSet.getLong("passportNumber"),
-                        resultSet.getLong("income")
+                        resultSet.getDouble("income")
                 );
             }
             dbConnection.close();
@@ -113,7 +113,7 @@ public class UserDatabaseDAO implements UserDAO {
             user.setPatronymic(resultSet.getString("patronymic"));
             user.setBirthday(resultSet.getString("birthday"));
             user.setPassportNumber(resultSet.getLong("passportNumber"));
-            user.setIncome(resultSet.getLong("income"));
+            user.setIncome(resultSet.getDouble("income"));
 
             return user;
         } else
@@ -126,7 +126,7 @@ public class UserDatabaseDAO implements UserDAO {
         preparedStatement.setString(3, user.getPatronymic());
         preparedStatement.setString(4, user.getBirthday());
         preparedStatement.setLong(5, user.getPassportNumber());
-        preparedStatement.setLong(6, user.getIncome());
+        preparedStatement.setDouble(6, user.getIncome());
     }
 
     @Override

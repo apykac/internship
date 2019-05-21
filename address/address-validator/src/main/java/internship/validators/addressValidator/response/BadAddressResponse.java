@@ -8,7 +8,7 @@ public class BadAddressResponse {
 	private String country;
 	private String city;
 	private String street;
-
+	private String crcs;
 	public String getUserId() {
 		return userId;
 	}
@@ -39,5 +39,13 @@ public class BadAddressResponse {
 
 	public void setStreet(String street) {
 		this.street = street;
+	}
+
+	public String getCrcs() {
+		return crcs;
+	}
+
+	public void setCrcs(String crcs) {
+		this.crcs = crcs;
 	}
 }

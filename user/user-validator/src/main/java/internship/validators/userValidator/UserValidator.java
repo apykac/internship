@@ -10,26 +10,25 @@ import java.text.SimpleDateFormat;
 public class UserValidator implements IUserValidator {
 	private static final int MAX_SIZE_NAME = 50;
 	private static final int MIN_SIZE_NAME = 2;
-	private static final int CURRENT_YEAR = 2019;
-	private final static String DATE_FORMAT = "dd-MM-yyyy";
+	private static final  String DATE_FORMAT = "dd-MM-yyyy";
+	private static final  int PASSPORT_SIZE=10;
+	private static final String USER_EXPRESSION_REG=String.format("^[а-яА-Я\\-\\s]{%d,%d}$", MIN_SIZE_NAME,MAX_SIZE_NAME);
+	private static final String DOP_USER_EXPRESSION_REG="^[\\-\\s]{1,50}$";
+	private static final String PASSPORT_NUMBER_EXPRESSION_REG=String.format("^[0-9]{%d}$",PASSPORT_SIZE);
+	private static final String BIRTHDAY_EXPRESSION_REG="^([0-9]{1,2}\\-[0-9]{1,2}\\-[1][9][2-9][0-9])|([0-9]{1,2}\\-[0-9]{1,2}\\-[2][0][0-1][0-8])";
+	private static final String INCOME_EXPRESSION_REG="^[0-9]{1,10}$";
 
-	private final BadUserResponse badUserResponse = new BadUserResponse();
+	private  BadUserResponse badUserResponse;
 
 	public boolean isNameValid(String name) {
 		if (name == null) {
-			badUserResponse.setNsp("В полях name, surname, patronymic присутствует пустое значение");
+			badUserResponse.setNsp("Поля name, surname, patronymic  пустое значение, имеет пустое значение.");
 			return false;
 		}
-		String tempName = name.trim();
-		if (tempName.length() < MIN_SIZE_NAME || tempName.length() > MAX_SIZE_NAME) {
-			badUserResponse.setNsp(String.format("Слишком маленькая или большая длина name, surname, patronymic (Допустимый размер от %d до %d)", MIN_SIZE_NAME, MAX_SIZE_NAME));
+		String temp=name.replaceAll("\\s+", " ").trim();
+		if(!temp.matches(USER_EXPRESSION_REG) || temp.matches(DOP_USER_EXPRESSION_REG)){
+			badUserResponse.setNsp("Поля name, surname, patronymic  имеют неподходящие символы.");
 			return false;
-		}
-		for (int i = 0; i < tempName.length(); i++) {
-			if (!Character.isLetter(tempName.charAt(i))) {
-				badUserResponse.setNsp("В полях name, surname, patronymic встречаются символы отличные от букв");
-				return false;
-			}
 		}
 		return true;
 	}
@@ -39,18 +38,17 @@ public class UserValidator implements IUserValidator {
 			badUserResponse.setBirthday("Введено пустое значение для даты рождения");
 			return false;
 		}
+		String temp=birthday.replace(".","-");
+		if(!temp.matches(BIRTHDAY_EXPRESSION_REG)){
+			badUserResponse.setBirthday("Введенна некорректная дата");
+			return false;
+		}
 		try {
 			DateFormat df = new SimpleDateFormat(DATE_FORMAT);
 			df.setLenient(false);
-			df.parse(birthday);
+			df.parse(temp);
 		} catch (ParseException e) {
-			badUserResponse.setBirthday("Введен неправильный формат даты(формат должен быть dd-MM-yyyy) или не существующая дата");
-			return false;
-		}
-		String[] a = birthday.split("-");
-		int yearOfBirth = Integer.parseInt(a[2]);
-		if (yearOfBirth <= 1900 || yearOfBirth > CURRENT_YEAR) {
-			badUserResponse.setBirthday("Введенная некорректная дата");
+			badUserResponse.setBirthday("Введен неправильный формат даты(формат должен быть dd-MM-yyyy или dd.MM.yyyy) или не существующая дата");
 			return false;
 		}
 		return true;
@@ -61,25 +59,34 @@ public class UserValidator implements IUserValidator {
 			badUserResponse.setPassportNumber("Пустое значение паспортных данных");
 			return false;
 		}
-		if (passport.toString().length() != 10) {
-			badUserResponse.setPassportNumber("Номер пасспорта должен содержать ровно 10 цифр");
+		if(!passport.toString().matches(PASSPORT_NUMBER_EXPRESSION_REG)){
+			badUserResponse.setPassportNumber("Номер пасспорта должен содержать только 10 цифр");
 			return false;
 		}
-		for (int i = 0; i < passport.toString().length(); i++) {
-			if (!Character.isDigit(passport.toString().charAt(i))) {
-				badUserResponse.setPassportNumber("В номере пасспорта присутствует символы отличные от цифр");
-				return false;
-			}
+		return true;
+	}
+
+	public boolean isIncomeValid(Double income){
+		System.out.println(income);
+		if(income==null){
+			badUserResponse.setIncome("Пустое значение дохода");
+			return false;
+		}
+		if(!(income.toString().matches(INCOME_EXPRESSION_REG))){
+			badUserResponse.setIncome("Доход должен состоять из пололжительного числа, не превышающий 9.999.999.999");
+			return false;
 		}
 		return true;
 	}
 
 	public boolean isValid(User user) {
+		badUserResponse = new BadUserResponse();
 		return (isNameValid(user.getName()) &
 				isNameValid(user.getSurname()) &
 				isNameValid(user.getPatronymic()) &
 				isDateBirthdayValid(user.getBirthday()) &
-				isPassportNumberValid(user.getPassportNumber()));
+				isPassportNumberValid(user.getPassportNumber())&
+				isIncomeValid(user.getIncome()));
 	}
 
 	public BadUserResponse getErrorMessage() {

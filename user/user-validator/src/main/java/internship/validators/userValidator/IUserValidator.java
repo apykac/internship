@@ -13,5 +13,7 @@ public interface IUserValidator {
 
 	boolean isValid(User user);
 
+	boolean isIncomeValid(Double income);
+
 	BadUserResponse getErrorMessage();
 }

@@ -10,7 +10,7 @@ public class Connector implements IConnector {
 
 		String url = "jdbc:postgresql://localhost:5432/vskDB";
 		String name = "postgres";
-		String password = "root";
+		String password = "12345";
 		Connection dbConnection;
 		try {
 			Class.forName("org.postgresql.Driver");

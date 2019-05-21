@@ -7,10 +7,7 @@ public class BadUserResponse {
 	private String nsp;
 	private String birthday;
 	private String passportNumber;
-
-	public String getNsp() {
-		return nsp;
-	}
+	private String income;
 
 	public void setNsp(String nsp) {
 		this.nsp = nsp;
@@ -30,5 +27,17 @@ public class BadUserResponse {
 
 	public void setPassportNumber(String passportNumber) {
 		this.passportNumber = passportNumber;
+	}
+
+	public void setIncome(String income) {
+		this.income = income;
+	}
+
+	public String getIncome() {
+		return income;
+	}
+
+	public String getNsp() {
+		return nsp;
 	}
 }
