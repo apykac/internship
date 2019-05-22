@@ -9,6 +9,8 @@ public interface IAddressValidator {
 
 	boolean isCountryValid(String country);
 
+	boolean isHouseNumberValid(String numberHouse);
+
 	boolean isValid(Address address);
 
 	BadAddressResponse getMessageError();

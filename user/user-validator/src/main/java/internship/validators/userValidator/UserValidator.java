@@ -16,16 +16,20 @@ public class UserValidator implements IUserValidator {
 	private static final String DOP_USER_EXPRESSION_REG="^[\\-\\s]{1,50}$";
 	private static final String PASSPORT_NUMBER_EXPRESSION_REG=String.format("^[0-9]{%d}$",PASSPORT_SIZE);
 	private static final String BIRTHDAY_EXPRESSION_REG="^([0-9]{1,2}\\-[0-9]{1,2}\\-[1][9][2-9][0-9])|([0-9]{1,2}\\-[0-9]{1,2}\\-[2][0][0-1][0-8])";
-	private static final String INCOME_EXPRESSION_REG="^[0-9]{1,10}$";
+	private static final String INCOME_EXPRESSION_REG="^[0-9.]{1,10}$";
 
 	private  BadUserResponse badUserResponse;
 
 	public boolean isNameValid(String name) {
 		if (name == null) {
-			badUserResponse.setNsp("Поля name, surname, patronymic  пустое значение, имеет пустое значение.");
+			badUserResponse.setNsp("Поля name, surname, patronymic  не могут иметь пустое значение.");
 			return false;
 		}
-		String temp=name.replaceAll("\\s+", " ").trim();
+		String temp=name.replaceAll("\\s+", " ").trim().replaceAll("\\-+","-");
+		if(temp.length()!=name.length()){
+			badUserResponse.setNsp("Поля name, surname, patronymic  содержат лишние символы пробела.");
+			return false;
+		}
 		if(!temp.matches(USER_EXPRESSION_REG) || temp.matches(DOP_USER_EXPRESSION_REG)){
 			badUserResponse.setNsp("Поля name, surname, patronymic  имеют неподходящие символы.");
 			return false;
@@ -39,6 +43,7 @@ public class UserValidator implements IUserValidator {
 			return false;
 		}
 		String temp=birthday.replace(".","-");
+
 		if(!temp.matches(BIRTHDAY_EXPRESSION_REG)){
 			badUserResponse.setBirthday("Введенна некорректная дата");
 			return false;
