@@ -81,14 +81,14 @@ public class AddressServiceImpl implements AddressService {
     @Path("/addresses/sort/")
     public Response sortAddressed(Addresses addresses) {
         List<Address> sortedAddress=new ArrayList<>();
+        addressSort.initList();
         System.out.println(addresses.getAddressList().size());
         for (Address address : addresses.getAddressList()) {
             sortedAddress = addressSort.sort(address);
         }
-        for(Address address: sortedAddress){
-            System.out.println(address.getRegion());
-        }
-        return Response.ok().type("application/xml").entity(sortedAddress).build();
+        Addresses addresses1=new Addresses();
+        addresses1.setAddressList(sortedAddress);
+        return Response.ok().type("application/xml").entity(addresses1).build();
     }
 
 
