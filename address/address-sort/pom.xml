@@ -3,36 +3,22 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>spring-2019</artifactId>
         <groupId>internship</groupId>
+        <artifactId>address</artifactId>
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>db-connector</artifactId>
+    <artifactId>address-sort</artifactId>
     <packaging>bundle</packaging>
-    <name>DBConnector</name>
-    <description>DBConnector for VSK internship</description>
+    <name>AddressSort</name>
+    <description>AddressSort for VSK internship</description>
 
     <dependencies>
-        <!-- LOGGING -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j13</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-api</artifactId>
-        </dependency>
-        <!-- POSTGRESQL -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.2.5</version>
+            <groupId>internship</groupId>
+            <artifactId>address-model</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -47,8 +33,10 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Description>${project.description}</Bundle-Description>
-                        <Bundle-Activator>internship.connectors.postgresConnector.Activator</Bundle-Activator>
-                        <Export-Package>internship.connectors.postgresConnector</Export-Package>
+                        <Bundle-Activator>internship.sort.addressSort.Activator</Bundle-Activator>
+                        <Export-Package>
+                            internship.sort.addressSort
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -63,5 +51,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>

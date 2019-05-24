@@ -19,6 +19,7 @@
         <module>address-service</module>
         <module>address-validator</module>
         <module>address-dao</module>
+        <module>address-sort</module>
     </modules>
 
 </project>

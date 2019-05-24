@@ -1,6 +1,7 @@
 package internship.services.addressService;
 
 import internship.dao.addressDAO.AddressDAO;
+import internship.sort.addressSort.IAddressSort;
 import internship.validators.addressValidator.IAddressValidator;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -16,6 +17,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 	private BundleContext context;
 	private ServiceTracker validationTracker;
 	private ServiceTracker daoTracker;
+	private ServiceTracker sortTracker;
 	private Server server = null;
 	private final AddressServiceImpl addressService = new AddressServiceImpl();
 
@@ -24,8 +26,10 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 		this.context = bundleContext;
 		validationTracker = new ServiceTracker(context, IAddressValidator.class.getName(), this);
 		daoTracker = new ServiceTracker(context, AddressDAO.class.getName(), this);
+		sortTracker=new ServiceTracker(context, IAddressSort.class.getName(), this);
 		validationTracker.open();
 		daoTracker.open();
+		sortTracker.open();
 
 		JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 		sf.setResourceClasses(addressService.getClass());
@@ -43,6 +47,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 		}
 		validationTracker.close();
 		daoTracker.close();
+		sortTracker.close();
 		this.context = null;
 	}
 
@@ -52,9 +57,16 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 
 		if (trackedService instanceof IAddressValidator) {
 			addressService.setUserValidator((IAddressValidator) trackedService);
+			System.out.println("AddressValidator service reg");
 		}
 		if (trackedService instanceof AddressDAO) {
 			addressService.setAddressDAO((AddressDAO) trackedService);
+			System.out.println("AddressDAO service reg");
+		}
+
+		if(trackedService instanceof IAddressSort){
+			addressService.setAddressSort((IAddressSort) trackedService);
+			System.out.println("AddressSort service reg");
 		}
 
 		return trackedService;
