@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
+/**
+ * REST-интерфейс для работы с сущностью пользователь
+ */
 public class UserServiceImpl implements UserService {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -27,6 +30,13 @@ public class UserServiceImpl implements UserService {
 		this.userDAO = userDAO;
 	}
 
+	/**
+	 * Получить пользователя, указав его id.
+	 * Возможные ошибки:
+	 * 1) Пользователь с данным ID не найден
+	 * @param id Id запрашиваемого пользователя
+	 * @return Возвращает информацию об указанном пользователе либо сообщение об ошибке.
+	 */
 	@GET
 	@Path("/users/{id}/")
 	public Response getUser(@PathParam("id") Long id) {
@@ -46,6 +56,15 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	/**
+	 * Перезаписывает пользователя с указанным id.
+	 * Возможные ошибки:
+	 * 1) Ошибки валидации
+	 * 2) База данных недоступна
+	 * @param id Id обновляемого пользователя
+	 * @param user Новый экземпляр пользователя
+	 * @return Возвращает обновлённый экземпляр пользователя либо сообщение об ошибке.
+	 */
 	@PUT
 	@Path("/users/{id}/")
 	public Response updateUser(@PathParam("id") Long id, User user) {
@@ -61,6 +80,14 @@ public class UserServiceImpl implements UserService {
 			return Response.status(Response.Status.BAD_REQUEST).entity(userValidator.getErrorMessage()).build();
 	}
 
+	/**
+	 * Создаёт нового пользователя.
+	 * Возможные ошибки:
+	 * 1) Ошибки валидации
+	 * 2) База данных недоступна
+	 * @param user Новый пользователь
+	 * @return Возвращает созданного пользователя.
+	 */
 	@POST
 	@Path("/users/")
 	public Response addUser(User user) {
@@ -75,6 +102,13 @@ public class UserServiceImpl implements UserService {
 			return Response.status(Response.Status.BAD_REQUEST).entity(userValidator.getErrorMessage()).build();
 	}
 
+	/**
+	 * Удаляет пользователя с указанным id.
+	 * Возможные ошибки:
+	 * 1) База данных недоступна
+	 * @param id Id удаляемого пользователя
+	 * @return Возвращает ok или сообщение об ошибке.
+	 */
 	@DELETE
 	@Path("/users/{id}/")
 	public Response deleteUser(@PathParam("id") Long id) {

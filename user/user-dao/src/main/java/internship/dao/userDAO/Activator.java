@@ -14,10 +14,11 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 	private ServiceTracker userDBConnectorTracker;
 	private BundleContext context;
 	private final UserDatabaseDAO databaseDAO = new UserDatabaseDAO();
+	private final UserDAO hmDAO = UserHashMapDAO.getInstance();
 
 	public void start(BundleContext bundleContext) {
 		this.context = bundleContext;
-		serviceRegistration = context.registerService(UserDAO.class.getName(), databaseDAO, null);
+		serviceRegistration = context.registerService(UserDAO.class.getName(), hmDAO, null);
 		userDBConnectorTracker = new ServiceTracker(context, IConnector.class.getName(), this);
 		userDBConnectorTracker.open();
 	}
