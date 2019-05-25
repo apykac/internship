@@ -2,6 +2,8 @@ package internship.dao.userDAO;
 
 import internship.connectors.postgresConnector.IConnector;
 import internship.models.userModel.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.ConnectException;
 import java.sql.Connection;
@@ -9,8 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-//FIXME Переписать запросы к базе, закрывать сессию (не ту, которая в универе, хотя, ту тоже лучше закрыть)
 public class UserDatabaseDAO implements UserDAO {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private IConnector connector;
     private Connection dbConnection;
@@ -23,27 +26,37 @@ public class UserDatabaseDAO implements UserDAO {
     @Override
     public User findUserById(Long id) {
         try {
+            dbConnection = connector.getConnection();
             if (dbConnection == null)
-                return null;
+                throw new ConnectException();
 
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM users WHERE id = ?");
+            PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM users WHERE user_id = ?");
             preparedStatement.setLong(1, id);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return new User(
-                        resultSet.getLong("id"),
+                        resultSet.getLong("user_id"),
                         resultSet.getString("name"),
                         resultSet.getString("surname"),
                         resultSet.getString("patronymic"),
                         resultSet.getString("birthday"),
-                        resultSet.getLong("passportNumber"),
+                        resultSet.getLong("passport_number"),
                         resultSet.getLong("income")
                 );
             }
-            dbConnection.close();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException | ConnectException e) {
+            log.error("Can't get user from database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+        } finally {
+            try {
+                dbConnection.close();
+            } catch (SQLException e) {
+                log.error("Can't close connection");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
         }
         return null;
     }
@@ -51,20 +64,30 @@ public class UserDatabaseDAO implements UserDAO {
     @Override
     public User updateUser(Long id, User user) {
         try {
+            dbConnection = connector.getConnection();
             if (dbConnection == null)
-                return null;
+                throw new ConnectException();
 
             PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE users " +
-                    "SET name = ?, surname = ?, patronymic = ?, birthday = ?, \"passportNumber\" = ?, income = ? " +
-                    "WHERE id = ? RETURNING id, name, surname, patronymic, birthday, \"passportNumber\", income");
+                    "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
+                    "WHERE user_id = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income");
             setStatement(user, preparedStatement);
             preparedStatement.setLong(7, id);
 
-            User userFromResultSet = getResultSet(preparedStatement.executeQuery(), user);
-            dbConnection.close();
-            return userFromResultSet;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            return resultSetToUser(preparedStatement.executeQuery(), user);
+
+        } catch (SQLException | ConnectException e) {
+            log.error("Can't update user in database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+        } finally {
+            try {
+                dbConnection.close();
+            } catch (SQLException e) {
+                log.error("Can't close connection");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
         }
         return null;
     }
@@ -72,19 +95,30 @@ public class UserDatabaseDAO implements UserDAO {
     @Override
     public User createUser(User user) {
         try {
+            dbConnection = connector.getConnection();
             if (dbConnection == null)
-                return null;
+                throw new ConnectException();
 
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO users" +
-                    "(name, surname, patronymic, birthday, \"passportNumber\", income) " +
-                    "VALUES (?, ?, ?, ?, ?, ?) RETURNING id, name, surname, patronymic, birthday, \"passportNumber\", income");
+            PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO users " +
+                    "(name, surname, patronymic, birthday, passport_number, income) " +
+                    "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id, name, surname, patronymic, birthday, passport_number, income");
             setStatement(user, preparedStatement);
 
-            User userFromResultSet = getResultSet(preparedStatement.executeQuery(), user);
-            dbConnection.close();
-            return userFromResultSet;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            return resultSetToUser(preparedStatement.executeQuery(), user);
+
+        } catch (SQLException | ConnectException e) {
+            log.error("Can't create user in database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+
+        } finally {
+            try {
+                dbConnection.close();
+            } catch (SQLException e) {
+                log.error("Can't close connection");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
         }
         return null;
     }
@@ -92,27 +126,37 @@ public class UserDatabaseDAO implements UserDAO {
     @Override
     public void removeUser(Long id) {
         try {
+            dbConnection = connector.getConnection();
             if (dbConnection == null)
                 throw new ConnectException();
 
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM users WHERE id = ?");
+            PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM users WHERE user_id = ?");
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
 
-            dbConnection.close();
         } catch (SQLException | ConnectException e) {
-            System.out.println(e.getMessage());
+            log.error("Can't remove user from database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+        } finally {
+            try {
+                dbConnection.close();
+            } catch (SQLException e) {
+                log.error("Can't close connection");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
         }
     }
 
-    private User getResultSet(ResultSet resultSet, User user) throws SQLException {
+    private User resultSetToUser(ResultSet resultSet, User user) throws SQLException {
         if (resultSet.next()) {
-            user.setId(resultSet.getLong("id"));
+            user.setId(resultSet.getLong("user_id"));
             user.setName(resultSet.getString("name"));
             user.setSurname(resultSet.getString("surname"));
             user.setPatronymic(resultSet.getString("patronymic"));
             user.setBirthday(resultSet.getString("birthday"));
-            user.setPassportNumber(resultSet.getLong("passportNumber"));
+            user.setPassportNumber(resultSet.getLong("passport_number"));
             user.setIncome(resultSet.getLong("income"));
 
             return user;

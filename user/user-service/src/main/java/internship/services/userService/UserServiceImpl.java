@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
 	@POST
 	@Path("/users/")
 	public Response addUser(User user) {
-		log.info("POST|AddtUser invoked.");
+        log.info("POST|AddUser invoked.");
 		if (isServicesUp())
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(userServiceResponse).build();
 

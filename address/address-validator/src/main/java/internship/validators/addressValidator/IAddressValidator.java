@@ -5,7 +5,7 @@ import internship.validators.addressValidator.response.BadAddressResponse;
 
 public interface IAddressValidator {
 
-	boolean isExitUserId(Long userId);
+    void isUserExists(Long userId);
 
 	boolean isCountryValid(String country);
 

@@ -1,37 +1,40 @@
 package internship.connectors.postgresConnector;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Connector implements IConnector {
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	public Connection getConnection() {
-		log.info("getConnection() invoked");
+    private static HikariConfig config = new HikariConfig();
+    private static HikariDataSource ds;
 
-		String url = "jdbc:postgresql://localhost:5432/vskDB";
-		String name = "postgres";
-		String password = "root";
-		Connection dbConnection;
-		try {
-			Class.forName("org.postgresql.Driver");
-		} catch (ClassNotFoundException e) {
-			log.error("Can't register JDBC driver.");
-			log.error(e.getMessage());
-			System.out.println(e.getMessage());
-		}
-		try {
-			dbConnection = DriverManager.getConnection(url, name, password);
-			return dbConnection;
-		} catch (SQLException e) {
-			log.error("Can't get connection from DriverManager.");
-			log.error(e.getMessage());
-			System.out.println(e.getMessage());
-		}
-		return null;
-	}
+    static {
+        config.setDriverClassName(org.postgresql.Driver.class.getName());
+        config.setJdbcUrl("jdbc:postgresql://localhost:5432/vskDB");
+        config.setUsername("postgres");
+        config.setPassword("12345");
+        config.setMaximumPoolSize(10);
+        ds = new HikariDataSource(config);
+    }
+
+    public Connection getConnection() {
+        log.info("getConnection() invoked");
+        try {
+            return ds.getConnection();
+        } catch (SQLException e) {
+            log.error("Can't get connection from DataSource.");
+            log.error(e.getMessage());
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    Connector() {
+    }
 }

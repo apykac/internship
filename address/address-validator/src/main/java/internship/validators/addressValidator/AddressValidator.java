@@ -4,23 +4,20 @@ import internship.dao.userDAO.UserDAO;
 import internship.models.addressModel.Address;
 import internship.validators.addressValidator.response.BadAddressResponse;
 
-//FIXME После непройденной валидации оишбки остаются даже при вводе верных данных
 public class AddressValidator implements IAddressValidator {
 
 	private UserDAO userDao;
 
-	private final BadAddressResponse badAddressResponse = new BadAddressResponse();
+	private BadAddressResponse badAddressResponse;
 
 	void setUserDao(UserDAO userDao) {
 		this.userDao = userDao;
 	}
 
-	public boolean isExitUserId(Long userId) {
+	public void isUserExists(Long userId) {
 		if (userDao.findUserById(userId) == null) {
-			badAddressResponse.setUserId("Ошибка, несуществующий Id пользователя");
-			return false;
+			badAddressResponse.getUserId().add("Пользователь с ID " + userId + " не найден");
 		}
-		return true;
 	}
 
 	public boolean isCountryValid(String country) {
@@ -42,7 +39,13 @@ public class AddressValidator implements IAddressValidator {
 	}
 
 	public boolean isValid(Address address) {
-		return isExitUserId(address.getUserId()) &
+		badAddressResponse = new BadAddressResponse();
+
+		for (Long userId : address.getUserId()) {
+			isUserExists(userId);
+		}
+
+		return badAddressResponse.getUserId().size() == 0 &
 				isCountryValid(address.getCountry());
 	}
 

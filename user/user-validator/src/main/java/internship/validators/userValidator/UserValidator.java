@@ -13,7 +13,7 @@ public class UserValidator implements IUserValidator {
 	private static final int CURRENT_YEAR = 2019;
 	private final static String DATE_FORMAT = "dd-MM-yyyy";
 
-	private final BadUserResponse badUserResponse = new BadUserResponse();
+    private BadUserResponse badUserResponse;
 
 	public boolean isNameValid(String name) {
 		if (name == null) {
@@ -75,6 +75,7 @@ public class UserValidator implements IUserValidator {
 	}
 
 	public boolean isValid(User user) {
+        badUserResponse = new BadUserResponse();
 		return (isNameValid(user.getName()) &
 				isNameValid(user.getSurname()) &
 				isNameValid(user.getPatronymic()) &

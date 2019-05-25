@@ -33,6 +33,10 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -47,7 +51,6 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Description>${project.description}</Bundle-Description>
                         <Bundle-Activator>internship.connectors.postgresConnector.Activator</Bundle-Activator>
-                        <Export-Package>internship.connectors.postgresConnector</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
