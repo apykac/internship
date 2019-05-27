@@ -16,29 +16,46 @@ public class UserDatabaseDAO implements UserDAO {
 
     private IConnector connector;
 
+    private final String CREATE_USER = "INSERT INTO users " +
+            "(name, surname, patronymic, birthday, passport_number, income) " +
+            "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id, name, surname, patronymic, birthday, passport_number, income";
+
+    private final String GET_USER = "SELECT * FROM users WHERE user_id = ?";
+
+    private final String UPDATE_USER = "UPDATE users " +
+            "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
+            "WHERE user_id = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income";
+
+    private final String DELETE_USER = "DELETE FROM users WHERE user_id = ?";
+
+
     void setConnector(IConnector connector) {
         this.connector = connector;
     }
 
     @Override
     public User findUserById(Long id) {
-        try (
-                Connection dbConnection = connector.getConnection();
-                PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM users WHERE user_id = ?")
-        ) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_USER)) {
+
             preparedStatement.setLong(1, id);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return new User(
-                        resultSet.getLong("user_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("surname"),
-                        resultSet.getString("patronymic"),
-                        resultSet.getString("birthday"),
-                        resultSet.getLong("passport_number"),
-                        resultSet.getLong("income")
-                );
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new User(
+                            resultSet.getLong("user_id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("surname"),
+                            resultSet.getString("patronymic"),
+                            resultSet.getString("birthday"),
+                            resultSet.getLong("passport_number"),
+                            resultSet.getLong("income")
+                    );
+                }
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
             }
         } catch (SQLException e) {
             log.error("Can't get user from database");
@@ -50,16 +67,19 @@ public class UserDatabaseDAO implements UserDAO {
 
     @Override
     public User updateUser(Long id, User user) {
-        try (
-                Connection dbConnection = connector.getConnection();
-                PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE users " +
-                        "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
-                        "WHERE user_id = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income")
-        ) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(UPDATE_USER)) {
+
             setStatement(user, preparedStatement);
             preparedStatement.setLong(7, id);
 
-            return resultSetToUser(preparedStatement.executeQuery(), user);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSetToUser(resultSet, user);
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
 
         } catch (SQLException e) {
             log.error("Can't update user in database");
@@ -71,31 +91,29 @@ public class UserDatabaseDAO implements UserDAO {
 
     @Override
     public User createUser(User user) {
-        try (
-                Connection dbConnection = connector.getConnection();
-                PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO users " +
-                        "(name, surname, patronymic, birthday, passport_number, income) " +
-                        "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id, name, surname, patronymic, birthday, passport_number, income")
-        ) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(CREATE_USER)) {
+
             setStatement(user, preparedStatement);
-
-            return resultSetToUser(preparedStatement.executeQuery(), user);
-
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSetToUser(resultSet, user);
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
         } catch (SQLException e) {
             log.error("Can't create user in database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
-
         }
         return null;
     }
 
     @Override
     public void removeUser(Long id) {
-        try (
-                Connection dbConnection = connector.getConnection();
-                PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM users WHERE user_id = ?")
-        ) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(DELETE_USER)) {
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
 

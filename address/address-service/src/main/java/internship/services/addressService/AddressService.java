@@ -6,11 +6,11 @@ import javax.ws.rs.core.Response;
 
 interface AddressService {
 
-	Response getAddress(Long id);
+    Response getAddress(Long id);
 
-	Response addAddress(Address address);
+    Response addAddress(Address address);
 
-	Response updateAddress(Long id, Address address);
+    Response updateAddress(Long id, Address address);
 
-	Response deleteAddress(Long id);
+    Response deleteAddress(Long id);
 }

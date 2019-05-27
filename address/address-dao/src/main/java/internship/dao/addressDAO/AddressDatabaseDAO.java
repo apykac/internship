@@ -18,46 +18,65 @@ public class AddressDatabaseDAO implements AddressDAO {
 
     private IConnector connector;
 
+    private final String CREATE_ADDRESS = "INSERT INTO addresses " +
+            "(country, region, city, street, house_number, apartment_number) " +
+            "VALUES (?, ?, ?, ?, ?, ?) RETURNING address_id, country, region, city, street, house_number, apartment_number";
+
+    private final String BIND_USER = "INSERT INTO user_address (user_id, address_id) " +
+            "VALUES (?, ?) ON CONFLICT (user_id, address_id) DO NOTHING RETURNING user_id";
+
+    private final String GET_ADDRESS = "SELECT * FROM addresses " +
+            "LEFT JOIN user_address ON user_address.address_id = addresses.address_id " +
+            "WHERE addresses.address_id = ?";
+
+    private final String UPDATE_ADDRESS = "UPDATE addresses " +
+            "SET country = ?, region = ?, city = ?, street = ?, house_number = ?, apartment_number = ? " +
+            "WHERE address_id = ? RETURNING address_id, country, region, city, street, house_number, apartment_number";
+
+    private final String DELETE_USER_WITHOUT_ADDRESS = "DELETE FROM user_address WHERE address_id = ? AND NOT user_id = ANY(?)";
+
+    private final String DELETE_ADDRESS = "DELETE FROM addresses WHERE address_id = ?";
+
     void setConnector(IConnector connector) {
         this.connector = connector;
     }
 
     @Override
     public Address findAddressById(Long id) {
-        try (
-                Connection dbConnection = connector.getConnection();
-                PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM addresses " +
-                                "LEFT JOIN user_address ON user_address.address_id = addresses.address_id " +
-                                "WHERE addresses.address_id = ?",
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE)
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_ADDRESS,
+                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
 
-        ) {
             preparedStatement.setLong(1, id);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (resultSet.next()) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
 
-                resultSet.beforeFirst();
-                Set<Long> userIDs = new HashSet<>();
-                while (resultSet.next()) {
-                    Long userId = resultSet.getLong("user_id");
-                    if (!resultSet.wasNull())
-                        userIDs.add(userId);
+                    resultSet.beforeFirst();
+                    Set<Long> userIDs = new HashSet<>();
+                    while (resultSet.next()) {
+                        Long userId = resultSet.getLong("user_id");
+                        if (!resultSet.wasNull())
+                            userIDs.add(userId);
+                    }
+
+                    resultSet.first();
+                    return new Address(
+                            resultSet.getLong("address_id"),
+                            userIDs,
+                            resultSet.getString("country"),
+                            resultSet.getString("region"),
+                            resultSet.getString("city"),
+                            resultSet.getString("street"),
+                            resultSet.getString("house_number"),
+                            resultSet.getString("apartment_number")
+                    );
                 }
-
-                resultSet.first();
-                return new Address(
-                        resultSet.getLong("address_id"),
-                        userIDs,
-                        resultSet.getString("country"),
-                        resultSet.getString("region"),
-                        resultSet.getString("city"),
-                        resultSet.getString("street"),
-                        resultSet.getString("house_number"),
-                        resultSet.getString("apartment_number")
-                );
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
             }
         } catch (SQLException e) {
             log.error("Can't get address from database");
@@ -69,30 +88,29 @@ public class AddressDatabaseDAO implements AddressDAO {
 
     @Override
     public Address updateAddress(Long id, Address address) {
-        try (
-                Connection dbConnection = connector.getConnection();
-                PreparedStatement addressStatement = dbConnection.prepareStatement("UPDATE addresses " +
-                                "SET country = ?, region = ?, city = ?, street = ?, house_number = ?, apartment_number = ? " +
-                                "WHERE address_id = ? RETURNING address_id, country, region, city, street, house_number, apartment_number",
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_id, address_id) " +
-                        "VALUES (?, ?) ON CONFLICT (user_id, address_id) DO NOTHING RETURNING user_id");
-                PreparedStatement deleteDuplicate = dbConnection.prepareStatement("DELETE FROM user_address WHERE address_id = ? AND NOT user_id = ANY(?)");
-        ) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement addressStatement = dbConnection.prepareStatement(UPDATE_ADDRESS,
+                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+             PreparedStatement userStatement = dbConnection.prepareStatement(BIND_USER);
+             PreparedStatement deleteDuplicate = dbConnection.prepareStatement(DELETE_USER_WITHOUT_ADDRESS)) {
+
             setStatement(address, addressStatement);
             addressStatement.setLong(7, id);
 
-            ResultSet addressResultSet = addressStatement.executeQuery();
-            resultSetToAddress(addressResultSet, address);
+            try (ResultSet resultSet = addressStatement.executeQuery()) {
+                resultSetToAddress(resultSet, address);
+                saveUserId(address, id, userStatement);
 
-            saveUserId(address, id, userStatement);
+                deleteDuplicate.setLong(1, id);
+                deleteDuplicate.setArray(2, dbConnection.createArrayOf("bigint", address.getUserId().toArray()));
+                deleteDuplicate.execute();
 
-            deleteDuplicate.setLong(1, id);
-            deleteDuplicate.setArray(2, dbConnection.createArrayOf("bigint", address.getUserId().toArray()));
-            deleteDuplicate.execute();
-
-            return address;
+                return address;
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
 
         } catch (SQLException e) {
             log.error("Can't update address in database");
@@ -104,25 +122,24 @@ public class AddressDatabaseDAO implements AddressDAO {
 
     @Override
     public Address createAddress(Address address) {
-        try (
-                Connection dbConnection = connector.getConnection();
-                PreparedStatement addressStatement = dbConnection.prepareStatement("INSERT INTO addresses " +
-                                "(country, region, city, street, house_number, apartment_number) " +
-                                "VALUES (?, ?, ?, ?, ?, ?) RETURNING address_id, country, region, city, street, house_number, apartment_number",
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address " +
-                        "(user_id, address_id) VALUES (?, ?) RETURNING user_id")
-        ) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement addressStatement = dbConnection.prepareStatement(CREATE_ADDRESS,
+                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+             PreparedStatement userStatement = dbConnection.prepareStatement(BIND_USER)) {
+
             setStatement(address, addressStatement);
 
-            ResultSet addressResultSet = addressStatement.executeQuery();
-            resultSetToAddress(addressResultSet, address);
+            try (ResultSet resultSet = addressStatement.executeQuery()) {
+                resultSetToAddress(resultSet, address);
+                if (resultSet.next())
+                    saveUserId(address, resultSet.getLong("address_id"), userStatement);
 
-            if (addressResultSet.next())
-                saveUserId(address, addressResultSet.getLong("address_id"), userStatement);
-
-            return address;
+                return address;
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
 
         } catch (SQLException e) {
             log.error("Can't create address in database");
@@ -135,10 +152,9 @@ public class AddressDatabaseDAO implements AddressDAO {
 
     @Override
     public void removeAddress(Long id) {
-        try (
-                Connection dbConnection = connector.getConnection();
-                PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM addresses WHERE address_id = ?")
-        ) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(DELETE_ADDRESS)) {
+
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
 
@@ -174,6 +190,7 @@ public class AddressDatabaseDAO implements AddressDAO {
 
     private void saveUserId(Address address, Long id, PreparedStatement userStatement) throws SQLException {
         userStatement.setLong(2, id);
+        //FIXME
         ResultSet bindingResult;
         for (Long userID : address.getUserId()) {
             userStatement.setLong(1, userID);
@@ -181,6 +198,13 @@ public class AddressDatabaseDAO implements AddressDAO {
             if (bindingResult.next())
                 address.getUserId().add(bindingResult.getLong("user_id"));
         }
+    }
+
+    private PreparedStatement createPreparedStatement(Connection con, int userId) throws SQLException {
+        String sql = "SELECT id, username FROM users WHERE id = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, userId);
+        return ps;
     }
 
     @Override
