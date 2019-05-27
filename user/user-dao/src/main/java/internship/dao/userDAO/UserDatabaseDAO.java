@@ -5,7 +5,6 @@ import internship.models.userModel.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,11 +22,10 @@ public class UserDatabaseDAO implements UserDAO {
 
     @Override
     public User findUserById(Long id) {
-        try (Connection dbConnection = connector.getConnection()) {
-            if (dbConnection == null)
-                throw new ConnectException();
-
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM users WHERE user_id = ?");
+        try (
+                Connection dbConnection = connector.getConnection();
+                PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM users WHERE user_id = ?")
+        ) {
             preparedStatement.setLong(1, id);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -42,7 +40,7 @@ public class UserDatabaseDAO implements UserDAO {
                         resultSet.getLong("income")
                 );
             }
-        } catch (SQLException | ConnectException e) {
+        } catch (SQLException e) {
             log.error("Can't get user from database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
@@ -52,19 +50,18 @@ public class UserDatabaseDAO implements UserDAO {
 
     @Override
     public User updateUser(Long id, User user) {
-        try (Connection dbConnection = connector.getConnection()) {
-            if (dbConnection == null)
-                throw new ConnectException();
-
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE users " +
-                    "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
-                    "WHERE user_id = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income");
+        try (
+                Connection dbConnection = connector.getConnection();
+                PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE users " +
+                        "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
+                        "WHERE user_id = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income")
+        ) {
             setStatement(user, preparedStatement);
             preparedStatement.setLong(7, id);
 
             return resultSetToUser(preparedStatement.executeQuery(), user);
 
-        } catch (SQLException | ConnectException e) {
+        } catch (SQLException e) {
             log.error("Can't update user in database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
@@ -74,18 +71,17 @@ public class UserDatabaseDAO implements UserDAO {
 
     @Override
     public User createUser(User user) {
-        try (Connection dbConnection = connector.getConnection()) {
-            if (dbConnection == null)
-                throw new ConnectException();
-
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO users " +
-                    "(name, surname, patronymic, birthday, passport_number, income) " +
-                    "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id, name, surname, patronymic, birthday, passport_number, income");
+        try (
+                Connection dbConnection = connector.getConnection();
+                PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO users " +
+                        "(name, surname, patronymic, birthday, passport_number, income) " +
+                        "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id, name, surname, patronymic, birthday, passport_number, income")
+        ) {
             setStatement(user, preparedStatement);
 
             return resultSetToUser(preparedStatement.executeQuery(), user);
 
-        } catch (SQLException | ConnectException e) {
+        } catch (SQLException e) {
             log.error("Can't create user in database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
@@ -96,15 +92,14 @@ public class UserDatabaseDAO implements UserDAO {
 
     @Override
     public void removeUser(Long id) {
-        try (Connection dbConnection = connector.getConnection()) {
-            if (dbConnection == null)
-                throw new ConnectException();
-
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM users WHERE user_id = ?");
+        try (
+                Connection dbConnection = connector.getConnection();
+                PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM users WHERE user_id = ?")
+        ) {
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
 
-        } catch (SQLException | ConnectException e) {
+        } catch (SQLException e) {
             log.error("Can't remove user from database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
