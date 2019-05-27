@@ -18,7 +18,6 @@ public class AddressDatabaseDAO implements AddressDAO {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private IConnector connector;
-    private Connection dbConnection;
 
     void setConnector(IConnector connector) {
         this.connector = connector;
@@ -26,13 +25,12 @@ public class AddressDatabaseDAO implements AddressDAO {
 
     @Override
     public Address findAddressById(Long id) {
-        try {
-            dbConnection = connector.getConnection();
+        try (Connection dbConnection = connector.getConnection()) {
             if (dbConnection == null)
                 throw new ConnectException();
 
             PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM addresses " +
-                            "JOIN user_address ON user_address.address_id = addresses.address_id " +
+                            "LEFT JOIN user_address ON user_address.address_id = addresses.address_id " +
                             "WHERE addresses.address_id = ?",
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
@@ -46,7 +44,8 @@ public class AddressDatabaseDAO implements AddressDAO {
                 Set<Long> userIDs = new HashSet<>();
                 while (resultSet.next()) {
                     Long userId = resultSet.getLong("user_id");
-                    userIDs.add(userId);
+                    if (!resultSet.wasNull())
+                        userIDs.add(userId);
                 }
 
                 resultSet.first();
@@ -65,22 +64,13 @@ public class AddressDatabaseDAO implements AddressDAO {
             log.error("Can't get address from database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
-        } finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                log.error("Can't close connection");
-                log.error(e.getMessage());
-                System.out.print(e.getMessage());
-            }
         }
         return null;
     }
 
     @Override
     public Address updateAddress(Long id, Address address) {
-        try {
-            dbConnection = connector.getConnection();
+        try (Connection dbConnection = connector.getConnection()) {
             if (dbConnection == null)
                 throw new ConnectException();
 
@@ -95,9 +85,14 @@ public class AddressDatabaseDAO implements AddressDAO {
             ResultSet addressResultSet = addressStatement.executeQuery();
             resultSetToAddress(addressResultSet, address);
 
-            PreparedStatement userStatement = dbConnection.prepareStatement("UPDATE user_address " +
-                    "SET user_id = ? WHERE address_id = ? RETURNING user_id");
+            PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_id, address_id) " +
+                    "VALUES (?, ?) ON CONFLICT (user_id, address_id) DO NOTHING RETURNING user_id");
             saveUserId(address, id, userStatement);
+
+            PreparedStatement deleteDuplicate = dbConnection.prepareStatement("DELETE FROM user_address WHERE address_id = ? AND NOT user_id = ANY(?)");
+            deleteDuplicate.setLong(1, id);
+            deleteDuplicate.setArray(2, dbConnection.createArrayOf("bigint", address.getUserId().toArray()));
+            deleteDuplicate.execute();
 
             return address;
 
@@ -105,22 +100,13 @@ public class AddressDatabaseDAO implements AddressDAO {
             log.error("Can't update address in database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
-        } finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                log.error("Can't close connection");
-                log.error(e.getMessage());
-                System.out.print(e.getMessage());
-            }
         }
         return null;
     }
 
     @Override
     public Address createAddress(Address address) {
-        try {
-            dbConnection = connector.getConnection();
+        try (Connection dbConnection = connector.getConnection()) {
             if (dbConnection == null)
                 throw new ConnectException();
 
@@ -146,22 +132,13 @@ public class AddressDatabaseDAO implements AddressDAO {
             log.error(e.getMessage());
             System.out.print(e.getMessage());
 
-        } finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                log.error("Can't close connection");
-                log.error(e.getMessage());
-                System.out.print(e.getMessage());
-            }
         }
         return null;
     }
 
     @Override
     public void removeAddress(Long id) {
-        try {
-            dbConnection = connector.getConnection();
+        try (Connection dbConnection = connector.getConnection()) {
             if (dbConnection == null)
                 throw new ConnectException();
 
@@ -173,14 +150,6 @@ public class AddressDatabaseDAO implements AddressDAO {
             log.error("Can't remove address from database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
-        } finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                log.error("Can't close connection");
-                log.error(e.getMessage());
-                System.out.print(e.getMessage());
-            }
         }
     }
 

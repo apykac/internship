@@ -19,6 +19,7 @@ public class Connector implements IConnector {
         config.setJdbcUrl("jdbc:postgresql://localhost:5432/vskDB");
         config.setUsername("postgres");
         config.setPassword("12345");
+		config.setMinimumIdle(3);
         config.setMaximumPoolSize(10);
         ds = new HikariDataSource(config);
     }

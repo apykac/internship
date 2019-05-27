@@ -16,17 +16,14 @@ public class UserDatabaseDAO implements UserDAO {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private IConnector connector;
-    private Connection dbConnection;
 
     void setConnector(IConnector connector) {
         this.connector = connector;
-        dbConnection = connector.getConnection();
     }
 
     @Override
     public User findUserById(Long id) {
-        try {
-            dbConnection = connector.getConnection();
+        try (Connection dbConnection = connector.getConnection()) {
             if (dbConnection == null)
                 throw new ConnectException();
 
@@ -49,22 +46,13 @@ public class UserDatabaseDAO implements UserDAO {
             log.error("Can't get user from database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
-        } finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                log.error("Can't close connection");
-                log.error(e.getMessage());
-                System.out.print(e.getMessage());
-            }
         }
         return null;
     }
 
     @Override
     public User updateUser(Long id, User user) {
-        try {
-            dbConnection = connector.getConnection();
+        try (Connection dbConnection = connector.getConnection()) {
             if (dbConnection == null)
                 throw new ConnectException();
 
@@ -80,22 +68,13 @@ public class UserDatabaseDAO implements UserDAO {
             log.error("Can't update user in database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
-        } finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                log.error("Can't close connection");
-                log.error(e.getMessage());
-                System.out.print(e.getMessage());
-            }
         }
         return null;
     }
 
     @Override
     public User createUser(User user) {
-        try {
-            dbConnection = connector.getConnection();
+        try (Connection dbConnection = connector.getConnection()) {
             if (dbConnection == null)
                 throw new ConnectException();
 
@@ -111,22 +90,13 @@ public class UserDatabaseDAO implements UserDAO {
             log.error(e.getMessage());
             System.out.print(e.getMessage());
 
-        } finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                log.error("Can't close connection");
-                log.error(e.getMessage());
-                System.out.print(e.getMessage());
-            }
         }
         return null;
     }
 
     @Override
     public void removeUser(Long id) {
-        try {
-            dbConnection = connector.getConnection();
+        try (Connection dbConnection = connector.getConnection()) {
             if (dbConnection == null)
                 throw new ConnectException();
 
@@ -138,14 +108,6 @@ public class UserDatabaseDAO implements UserDAO {
             log.error("Can't remove user from database");
             log.error(e.getMessage());
             System.out.print(e.getMessage());
-        } finally {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                log.error("Can't close connection");
-                log.error(e.getMessage());
-                System.out.print(e.getMessage());
-            }
         }
     }
 
