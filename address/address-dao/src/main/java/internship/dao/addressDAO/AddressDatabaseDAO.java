@@ -49,7 +49,6 @@ public class AddressDatabaseDAO implements AddressDAO {
 
             preparedStatement.setLong(1, id);
 
-
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
 
@@ -190,21 +189,14 @@ public class AddressDatabaseDAO implements AddressDAO {
 
     private void saveUserId(Address address, Long id, PreparedStatement userStatement) throws SQLException {
         userStatement.setLong(2, id);
-        //FIXME
-        ResultSet bindingResult;
         for (Long userID : address.getUserId()) {
             userStatement.setLong(1, userID);
-            bindingResult = userStatement.executeQuery();
-            if (bindingResult.next())
-                address.getUserId().add(bindingResult.getLong("user_id"));
+            try (ResultSet resultSet = userStatement.executeQuery()) {
+                if (resultSet.next())
+                    address.getUserId().add(resultSet.getLong("user_id"));
+            }
         }
-    }
 
-    private PreparedStatement createPreparedStatement(Connection con, int userId) throws SQLException {
-        String sql = "SELECT id, username FROM users WHERE id = ?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, userId);
-        return ps;
     }
 
     @Override
