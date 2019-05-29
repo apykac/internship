@@ -1,11 +1,14 @@
 package internship.dao.userDAO;
 
 import internship.models.userModel.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class UserHashMapDAO implements UserDAO {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     private static UserHashMapDAO dao;
     private final Map<Long, User> users = new HashMap<>();
     private Long currentId = 1L;
@@ -24,6 +27,12 @@ public class UserHashMapDAO implements UserDAO {
     @Override
     public User findUserById(Long id) {
         return users.get(id);
+    }
+
+    @Override
+    public User findUserByPassport(Long passport) {
+        log.warn("Get user by passport is not implemented in HashMapDAO");
+        return null;
     }
 
     @Override

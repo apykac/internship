@@ -31,25 +31,25 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-	 * Получить пользователя, указав его id.
+	 * Получить пользователя, указав его номер паспорта.
 	 * Возможные ошибки:
-	 * 1) Пользователь с данным ID не найден
-	 * @param id Id запрашиваемого пользователя
+	 * 1) Пользователь с указанным номером паспорта не найден
+	 * @param passport Номер паспорта запрашиваемого пользователя
 	 * @return Возвращает информацию об указанном пользователе либо сообщение об ошибке.
 	 */
 	@GET
-	@Path("/users/{id}/")
-	public Response getUser(@PathParam("id") Long id) {
-		log.info("GET|GetUser invoked. userId="+id);
+	@Path("/users/{passport}/")
+	public Response getUser(@PathParam("passport") Long passport) {
+		log.info("GET|GetUser invoked. userId="+passport);
 
 		if (isServicesUp()) {
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(userServiceResponse).build();
 		}
 
-		log.info("LOG get user " + id);
-		User userFromDB = userDAO.findUserById(id);
+		log.info("LOG get user " + passport);
+		User userFromDB = userDAO.findUserByPassport(passport);
 		if (userFromDB == null) {
-			return Response.status(Response.Status.NO_CONTENT).entity("Пользователь с данным ID не найден").build();
+			return Response.status(Response.Status.NO_CONTENT).entity("Пользователь с указанным номером паспорта не найден").build();
 		}
 		else {
 			return Response.ok().type("application/xml").entity(userFromDB).build();
