@@ -5,6 +5,8 @@ import internship.models.userModel.User;
 public interface UserDAO {
     User findUserById(Long id);
 
+    User findUserByPassport(Long passport);
+
     User updateUser(Long id, User user);
 
     User createUser(User user);
