@@ -7,11 +7,11 @@ public interface UserDAO {
 
     User findUserByPassport(Long passport);
 
-    User updateUser(Long id, User user);
+    User updateUser(Long passport, User user);
 
     User createUser(User user);
 
-    void removeUser(Long id);
+    void removeUser(Long passport);
 
     boolean isConnectorUp();
 }

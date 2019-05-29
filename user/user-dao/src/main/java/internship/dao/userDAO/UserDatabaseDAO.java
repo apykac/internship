@@ -28,8 +28,13 @@ public class UserDatabaseDAO implements UserDAO {
             "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
             "WHERE user_id = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income";
 
+    private final String UPDATE_USER_BY_PASSPORT = "UPDATE users " +
+            "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
+            "WHERE passport_number = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income";
+
     private final String DELETE_USER = "DELETE FROM users WHERE user_id = ?";
 
+    private final String DELETE_USER_BY_PASSPORT = "DELETE FROM users WHERE passport_number = ?";
 
     void setConnector(IConnector connector) {
         this.connector = connector;
@@ -99,12 +104,12 @@ public class UserDatabaseDAO implements UserDAO {
     }
 
     @Override
-    public User updateUser(Long id, User user) {
+    public User updateUser(Long passport, User user) {
         try (Connection dbConnection = connector.getConnection();
-             PreparedStatement preparedStatement = dbConnection.prepareStatement(UPDATE_USER)) {
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(UPDATE_USER_BY_PASSPORT)) {
 
             setStatement(user, preparedStatement);
-            preparedStatement.setLong(7, id);
+            preparedStatement.setLong(7, passport);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 return resultSetToUser(resultSet, user);
@@ -144,10 +149,10 @@ public class UserDatabaseDAO implements UserDAO {
     }
 
     @Override
-    public void removeUser(Long id) {
+    public void removeUser(Long passport) {
         try (Connection dbConnection = connector.getConnection();
-             PreparedStatement preparedStatement = dbConnection.prepareStatement(DELETE_USER)) {
-            preparedStatement.setLong(1, id);
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(DELETE_USER_BY_PASSPORT)) {
+            preparedStatement.setLong(1, passport);
             preparedStatement.execute();
 
         } catch (SQLException e) {

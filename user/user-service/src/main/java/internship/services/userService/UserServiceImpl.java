@@ -40,13 +40,12 @@ public class UserServiceImpl implements UserService {
 	@GET
 	@Path("/users/{passport}/")
 	public Response getUser(@PathParam("passport") Long passport) {
-		log.info("GET|GetUser invoked. userId="+passport);
+		log.info(String.format("GET|GetUser {passportNumber=%d}", passport));
 
 		if (isServicesUp()) {
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(userServiceResponse).build();
 		}
 
-		log.info("LOG get user " + passport);
 		User userFromDB = userDAO.findUserByPassport(passport);
 		if (userFromDB == null) {
 			return Response.status(Response.Status.NO_CONTENT).entity("Пользователь с указанным номером паспорта не найден").build();
@@ -61,20 +60,20 @@ public class UserServiceImpl implements UserService {
 	 * Возможные ошибки:
 	 * 1) Ошибки валидации
 	 * 2) База данных недоступна
-	 * @param id Id обновляемого пользователя
+	 * @param passport Номер паспорта обновляемого пользователя
 	 * @param user Новый экземпляр пользователя
 	 * @return Возвращает обновлённый экземпляр пользователя либо сообщение об ошибке.
 	 */
 	@PUT
-	@Path("/users/{id}/")
-	public Response updateUser(@PathParam("id") Long id, User user) {
-		log.info("PUT|UpdateUser invoked. userId="+id);
+	@Path("/users/{passport}/")
+	public Response updateUser(@PathParam("passport") Long passport, User user) {
+		log.info(String.format("PUT|UpdateUser {passportNumber=%d}", passport));
 
 		if (isServicesUp())
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(userServiceResponse).build();
 
 		if (userValidator.isValid(user)) {
-			User updatedUser = userDAO.updateUser(id, user);
+			User updatedUser = userDAO.updateUser(passport, user);
 			return Response.ok().type("application/xml").entity(updatedUser).build();
 		} else
 			return Response.status(Response.Status.BAD_REQUEST).entity(userValidator.getErrorMessage()).build();
@@ -91,7 +90,7 @@ public class UserServiceImpl implements UserService {
 	@POST
 	@Path("/users/")
 	public Response addUser(User user) {
-		log.info("POST|AddtUser invoked.");
+		log.info(String.format("POST|AddUser {passportNumber=%d, name=%s, surname=%s, patronymic=%s}", user.getPassportNumber(),user.getName(), user.getSurname(), user.getPatronymic()));
 		if (isServicesUp())
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(userServiceResponse).build();
 
@@ -103,20 +102,20 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-	 * Удаляет пользователя с указанным id.
+	 * Удаляет пользователя с указанным номером паспорта.
 	 * Возможные ошибки:
 	 * 1) База данных недоступна
-	 * @param id Id удаляемого пользователя
+	 * @param passport Номер паспорта удаляемого пользователя
 	 * @return Возвращает ok или сообщение об ошибке.
 	 */
 	@DELETE
-	@Path("/users/{id}/")
-	public Response deleteUser(@PathParam("id") Long id) {
-		log.info("DELETE|DeleteUser invoked. userId="+id);
+	@Path("/users/{passport}/")
+	public Response deleteUser(@PathParam("passport") Long passport) {
+		log.info(String.format("DELETE|DeleteUser {passportNumber=%d}", passport));
 		if (isServicesUp())
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(userServiceResponse).build();
 
-		userDAO.removeUser(id);
+		userDAO.removeUser(passport);
 		return Response.ok().build();
 	}
 
