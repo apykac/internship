@@ -2,117 +2,136 @@ package internship.dao.userDAO;
 
 import internship.connectors.postgresConnector.IConnector;
 import internship.models.userModel.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-//FIXME Переписать запросы к базе, закрывать сессию (не ту, которая в универе, хотя, ту тоже лучше закрыть)
 public class UserDatabaseDAO implements UserDAO {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     private IConnector connector;
-    private Connection dbConnection;
+
+    private final String CREATE_USER = "INSERT INTO users " +
+            "(name, surname, patronymic, birthday, passport_number, income) " +
+            "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id, name, surname, patronymic, birthday, passport_number, income";
+
+    private final String GET_USER = "SELECT * FROM users WHERE user_id = ?";
+
+    private final String UPDATE_USER = "UPDATE users " +
+            "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
+            "WHERE user_id = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income";
+
+    private final String DELETE_USER = "DELETE FROM users WHERE user_id = ?";
+
 
     void setConnector(IConnector connector) {
         this.connector = connector;
-        dbConnection = connector.getConnection();
     }
 
     @Override
     public User findUserById(Long id) {
-        try {
-            if (dbConnection == null)
-                return null;
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_USER)) {
 
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM users WHERE id = ?");
             preparedStatement.setLong(1, id);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return new User(
-                        resultSet.getLong("id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("surname"),
-                        resultSet.getString("patronymic"),
-                        resultSet.getString("birthday"),
-                        resultSet.getLong("passportNumber"),
-                        resultSet.getLong("income")
-                );
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new User(
+                            resultSet.getLong("user_id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("surname"),
+                            resultSet.getString("patronymic"),
+                            resultSet.getString("birthday"),
+                            resultSet.getLong("passport_number"),
+                            resultSet.getLong("income")
+                    );
+                }
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
             }
-            dbConnection.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            log.error("Can't get user from database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
         }
         return null;
     }
 
     @Override
     public User updateUser(Long id, User user) {
-        try {
-            if (dbConnection == null)
-                return null;
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(UPDATE_USER)) {
 
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE users " +
-                    "SET name = ?, surname = ?, patronymic = ?, birthday = ?, \"passportNumber\" = ?, income = ? " +
-                    "WHERE id = ? RETURNING id, name, surname, patronymic, birthday, \"passportNumber\", income");
             setStatement(user, preparedStatement);
             preparedStatement.setLong(7, id);
 
-            User userFromResultSet = getResultSet(preparedStatement.executeQuery(), user);
-            dbConnection.close();
-            return userFromResultSet;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSetToUser(resultSet, user);
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
+
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            log.error("Can't update user in database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
         }
         return null;
     }
 
     @Override
     public User createUser(User user) {
-        try {
-            if (dbConnection == null)
-                return null;
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(CREATE_USER)) {
 
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO users" +
-                    "(name, surname, patronymic, birthday, \"passportNumber\", income) " +
-                    "VALUES (?, ?, ?, ?, ?, ?) RETURNING id, name, surname, patronymic, birthday, \"passportNumber\", income");
             setStatement(user, preparedStatement);
-
-            User userFromResultSet = getResultSet(preparedStatement.executeQuery(), user);
-            dbConnection.close();
-            return userFromResultSet;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSetToUser(resultSet, user);
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            log.error("Can't create user in database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
         }
         return null;
     }
 
     @Override
     public void removeUser(Long id) {
-        try {
-            if (dbConnection == null)
-                throw new ConnectException();
-
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM users WHERE id = ?");
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(DELETE_USER)) {
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
 
-            dbConnection.close();
-        } catch (SQLException | ConnectException e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            log.error("Can't remove user from database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
         }
     }
 
-    private User getResultSet(ResultSet resultSet, User user) throws SQLException {
+    private User resultSetToUser(ResultSet resultSet, User user) throws SQLException {
         if (resultSet.next()) {
-            user.setId(resultSet.getLong("id"));
+            user.setId(resultSet.getLong("user_id"));
             user.setName(resultSet.getString("name"));
             user.setSurname(resultSet.getString("surname"));
             user.setPatronymic(resultSet.getString("patronymic"));
             user.setBirthday(resultSet.getString("birthday"));
-            user.setPassportNumber(resultSet.getLong("passportNumber"));
+            user.setPassportNumber(resultSet.getLong("passport_number"));
             user.setIncome(resultSet.getLong("income"));
 
             return user;

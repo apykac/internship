@@ -1,103 +1,108 @@
 package internship.models.addressModel;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
+import java.util.Set;
 
 @XmlRootElement(name = "Address")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Address {
-	private long id;
-	private long userId;
-	private String country;
-	private String region;
-	private String city;
-	private String street;
-	private String houseNumber;
-	private String apartmentNumber;
+    private long id;
+    private String country;
+    private String region;
+    private String city;
+    private String street;
+    private String houseNumber;
+    private String apartmentNumber;
 
-	public long getId() {
-		return id;
-	}
+    @XmlElementWrapper(name = "Users")
+    @XmlElement(name = "userID")
+    private Set<Long> userId;
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public long getUserId() {
-		return userId;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public void setUserId(long userId) {
-		this.userId = userId;
-	}
+    public Set<Long> getUserId() {
+        return userId;
+    }
 
-	public String getCountry() {
-		return country;
-	}
+    public void setUserId(Set<Long> userId) {
+        this.userId = userId;
+    }
 
-	public void setCountry(String country) {
-		this.country = country;
-	}
+    public String getCountry() {
+        return country;
+    }
 
-	public String getCity() {
-		return city;
-	}
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
-	public void setCity(String city) {
-		this.city = city;
-	}
+    public String getCity() {
+        return city;
+    }
 
-	public String getStreet() {
-		return street;
-	}
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-	public void setStreet(String street) {
-		this.street = street;
-	}
+    public String getStreet() {
+        return street;
+    }
 
-	public String getHouseNumber() {
-		return houseNumber;
-	}
+    public void setStreet(String street) {
+        this.street = street;
+    }
 
-	public void setHouseNumber(String houseNumber) {
-		this.houseNumber = houseNumber;
-	}
+    public String getHouseNumber() {
+        return houseNumber;
+    }
 
-	public String getApartmentNumber() {
-		return apartmentNumber;
-	}
+    public void setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
+    }
 
-	public void setApartmentNumber(String apartmentNumber) {
-		this.apartmentNumber = apartmentNumber;
-	}
+    public String getApartmentNumber() {
+        return apartmentNumber;
+    }
 
-	public String getRegion() {
-		return region;
-	}
+    public void setApartmentNumber(String apartmentNumber) {
+        this.apartmentNumber = apartmentNumber;
+    }
 
-	public void setRegion(String region) {
-		this.region = region;
-	}
+    public String getRegion() {
+        return region;
+    }
 
-	public Address() {
-	}
+    public void setRegion(String region) {
+        this.region = region;
+    }
 
-	public Address(long id, long userId, String country, String region, String city, String street, String houseNumber, String apartmentNumber) {
-		this.id = id;
-		this.userId = userId;
-		this.country = country;
-		this.region = region;
-		this.city = city;
-		this.street = street;
-		this.houseNumber = houseNumber;
-		this.apartmentNumber = apartmentNumber;
-	}
+    public Address() {
+    }
 
-	public Address(long userId, String country, String region, String city, String street, String houseNumber, String apartmentNumber) {
-		this.userId = userId;
-		this.country = country;
-		this.region = region;
-		this.city = city;
-		this.street = street;
-		this.houseNumber = houseNumber;
-		this.apartmentNumber = apartmentNumber;
-	}
+    public Address(long id, Set<Long> userId, String country, String region, String city, String street, String houseNumber, String apartmentNumber) {
+        this.id = id;
+        this.userId = userId;
+        this.country = country;
+        this.region = region;
+        this.city = city;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.apartmentNumber = apartmentNumber;
+    }
+
+    public Address(Set<Long> userId, String country, String region, String city, String street, String houseNumber, String apartmentNumber) {
+        this.userId = userId;
+        this.country = country;
+        this.region = region;
+        this.city = city;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.apartmentNumber = apartmentNumber;
+    }
 }

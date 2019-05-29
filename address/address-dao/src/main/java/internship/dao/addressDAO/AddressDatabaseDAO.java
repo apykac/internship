@@ -2,140 +2,205 @@ package internship.dao.addressDAO;
 
 import internship.connectors.postgresConnector.IConnector;
 import internship.models.addressModel.Address;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
-//FIXME Переписать запросы к базе, закрывать сессию (не ту, которая в универе, хотя, ту тоже лучше закрыть)
 public class AddressDatabaseDAO implements AddressDAO {
 
-	private IConnector connector;
-	private Connection dbConnection;
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	void setConnector(IConnector connector) {
-		this.connector = connector;
-		dbConnection = connector.getConnection();
-	}
+    private IConnector connector;
 
-	@Override
-	public Address findAddressById(Long id) {
-		try {
-			if (dbConnection == null)
-				return null;
+    private final String CREATE_ADDRESS = "INSERT INTO addresses " +
+            "(country, region, city, street, house_number, apartment_number) " +
+            "VALUES (?, ?, ?, ?, ?, ?) RETURNING address_id, country, region, city, street, house_number, apartment_number";
 
-			PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM addresses WHERE id = ?");
-			preparedStatement.setLong(1, id);
+    private final String BIND_USER = "INSERT INTO user_address (user_id, address_id) " +
+            "VALUES (?, ?) ON CONFLICT (user_id, address_id) DO NOTHING RETURNING user_id";
 
-			ResultSet resultSet = preparedStatement.executeQuery();
-			if (resultSet.next()) {
-				return new Address(
-						resultSet.getLong("id"),
-						resultSet.getLong("userId"),
-						resultSet.getString("country"),
-						resultSet.getString("region"),
-						resultSet.getString("city"),
-						resultSet.getString("street"),
-						resultSet.getString("houseNumber"),
-						resultSet.getString("apartmentNumber")
-				);
-			}
-			dbConnection.close();
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return null;
-	}
+    private final String GET_ADDRESS = "SELECT * FROM addresses " +
+            "LEFT JOIN user_address ON user_address.address_id = addresses.address_id " +
+            "WHERE addresses.address_id = ?";
 
-	@Override
-	public Address updateAddress(Long id, Address address) {
-		try {
-			if (dbConnection == null)
-				return null;
+    private final String UPDATE_ADDRESS = "UPDATE addresses " +
+            "SET country = ?, region = ?, city = ?, street = ?, house_number = ?, apartment_number = ? " +
+            "WHERE address_id = ? RETURNING address_id, country, region, city, street, house_number, apartment_number";
 
-			PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE addresses " +
-					"SET \"userId\" = ?, country = ?, region = ?, city = ?, street = ?, \"houseNumber\" = ?, \"apartmentNumber\" = ? " +
-					"WHERE id = ? RETURNING id, \"userId\", country, region, city, street, \"houseNumber\", \"apartmentNumber\"");
-			setStatement(address, preparedStatement);
-			preparedStatement.setLong(8, id);
+    private final String DELETE_USER_WITHOUT_ADDRESS = "DELETE FROM user_address WHERE address_id = ? AND NOT user_id = ANY(?)";
 
-			Address addressFromResultSet = getResultSet(preparedStatement.executeQuery(), address);
-			dbConnection.close();
-			return addressFromResultSet;
+    private final String DELETE_ADDRESS = "DELETE FROM addresses WHERE address_id = ?";
 
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return null;
-	}
+    void setConnector(IConnector connector) {
+        this.connector = connector;
+    }
 
-	@Override
-	public Address createAddress(Address address) {
-		try {
-			if (dbConnection == null)
-				return null;
+    @Override
+    public Address findAddressById(Long id) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_ADDRESS,
+                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
 
-			PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO public.addresses " +
-					"(\"userId\", country, region, city, street, \"houseNumber\", \"apartmentNumber\") " +
-					"VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id, \"userId\", country, region, city, street, \"houseNumber\", \"apartmentNumber\"");
-			setStatement(address, preparedStatement);
+            preparedStatement.setLong(1, id);
 
-			Address addressFromResultSet = getResultSet(preparedStatement.executeQuery(), address);
-			dbConnection.close();
-			return addressFromResultSet;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
 
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return null;
-	}
+                    resultSet.beforeFirst();
+                    Set<Long> userIDs = new HashSet<>();
+                    while (resultSet.next()) {
+                        Long userId = resultSet.getLong("user_id");
+                        if (!resultSet.wasNull())
+                            userIDs.add(userId);
+                    }
 
-	@Override
-	public void removeAddress(Long id) {
-		try {
-			if (dbConnection == null)
-				throw new ConnectException();
+                    resultSet.first();
+                    return new Address(
+                            resultSet.getLong("address_id"),
+                            userIDs,
+                            resultSet.getString("country"),
+                            resultSet.getString("region"),
+                            resultSet.getString("city"),
+                            resultSet.getString("street"),
+                            resultSet.getString("house_number"),
+                            resultSet.getString("apartment_number")
+                    );
+                }
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
+        } catch (SQLException e) {
+            log.error("Can't get address from database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+        }
+        return null;
+    }
 
-			PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM addresses WHERE id = ?");
-			preparedStatement.setLong(1, id);
-			preparedStatement.execute();
+    @Override
+    public Address updateAddress(Long id, Address address) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement addressStatement = dbConnection.prepareStatement(UPDATE_ADDRESS,
+                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+             PreparedStatement userStatement = dbConnection.prepareStatement(BIND_USER);
+             PreparedStatement deleteDuplicate = dbConnection.prepareStatement(DELETE_USER_WITHOUT_ADDRESS)) {
 
-			dbConnection.close();
-		} catch (SQLException | ConnectException e) {
-			System.out.println(e.getMessage());
-		}
-	}
+            setStatement(address, addressStatement);
+            addressStatement.setLong(7, id);
 
-	private void setStatement(Address address, PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setLong(1, address.getUserId());
-		preparedStatement.setString(2, address.getCountry());
-		preparedStatement.setString(3, address.getRegion());
-		preparedStatement.setString(4, address.getCity());
-		preparedStatement.setString(5, address.getStreet());
-		preparedStatement.setString(6, address.getHouseNumber());
-		preparedStatement.setString(7, address.getApartmentNumber());
-	}
+            try (ResultSet resultSet = addressStatement.executeQuery()) {
+                resultSetToAddress(resultSet, address);
+                saveUserId(address, id, userStatement);
 
-	private Address getResultSet(ResultSet resultSet, Address address) throws SQLException {
-		if (resultSet.next()) {
-			address.setId(resultSet.getLong("id"));
-			address.setUserId(resultSet.getLong("userId"));
-			address.setCountry(resultSet.getString("country"));
-			address.setRegion(resultSet.getString("region"));
-			address.setCity(resultSet.getString("city"));
-			address.setStreet(resultSet.getString("street"));
-			address.setHouseNumber(resultSet.getString("houseNumber"));
-			address.setApartmentNumber(resultSet.getString("apartmentNumber"));
+                deleteDuplicate.setLong(1, id);
+                deleteDuplicate.setArray(2, dbConnection.createArrayOf("bigint", address.getUserId().toArray()));
+                deleteDuplicate.execute();
 
-			return address;
-		} else
-			return null;
-	}
+                return address;
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
 
-	@Override
-	public boolean isConnectorUp() {
-		return connector != null;
-	}
+        } catch (SQLException e) {
+            log.error("Can't update address in database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public Address createAddress(Address address) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement addressStatement = dbConnection.prepareStatement(CREATE_ADDRESS,
+                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+             PreparedStatement userStatement = dbConnection.prepareStatement(BIND_USER)) {
+
+            setStatement(address, addressStatement);
+
+            try (ResultSet resultSet = addressStatement.executeQuery()) {
+                resultSetToAddress(resultSet, address);
+                if (resultSet.next())
+                    saveUserId(address, resultSet.getLong("address_id"), userStatement);
+
+                return address;
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
+
+        } catch (SQLException e) {
+            log.error("Can't create address in database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+
+        }
+        return null;
+    }
+
+    @Override
+    public void removeAddress(Long id) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement(DELETE_ADDRESS)) {
+
+            preparedStatement.setLong(1, id);
+            preparedStatement.execute();
+
+        } catch (SQLException e) {
+            log.error("Can't remove address from database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+        }
+    }
+
+    private void setStatement(Address address, PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.setString(1, address.getCountry());
+        preparedStatement.setString(2, address.getRegion());
+        preparedStatement.setString(3, address.getCity());
+        preparedStatement.setString(4, address.getStreet());
+        preparedStatement.setString(5, address.getHouseNumber());
+        preparedStatement.setString(6, address.getApartmentNumber());
+    }
+
+    private void resultSetToAddress(ResultSet resultSet, Address address) throws SQLException {
+        if (resultSet.next()) {
+            address.setId(resultSet.getLong("address_id"));
+            address.setCountry(resultSet.getString("country"));
+            address.setRegion(resultSet.getString("region"));
+            address.setCity(resultSet.getString("city"));
+            address.setStreet(resultSet.getString("street"));
+            address.setHouseNumber(resultSet.getString("house_number"));
+            address.setApartmentNumber(resultSet.getString("apartment_number"));
+
+            resultSet.beforeFirst();
+        }
+    }
+
+    private void saveUserId(Address address, Long id, PreparedStatement userStatement) throws SQLException {
+        userStatement.setLong(2, id);
+        for (Long userID : address.getUserId()) {
+            userStatement.setLong(1, userID);
+            try (ResultSet resultSet = userStatement.executeQuery()) {
+                if (resultSet.next())
+                    address.getUserId().add(resultSet.getLong("user_id"));
+            }
+        }
+
+    }
+
+    @Override
+    public boolean isConnectorUp() {
+        return connector != null;
+    }
 }

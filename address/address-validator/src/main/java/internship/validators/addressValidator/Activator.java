@@ -10,42 +10,42 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 
-	private ServiceRegistration serviceRegistration;
-	private ServiceTracker userDaoTracker;
-	private BundleContext context;
-	private final AddressValidator addressValidator = new AddressValidator();
+    private ServiceRegistration serviceRegistration;
+    private ServiceTracker userDaoTracker;
+    private BundleContext context;
+    private final AddressValidator addressValidator = new AddressValidator();
 
-	@Override
-	public void start(BundleContext bundleContext) {
-		this.context = bundleContext;
-		serviceRegistration = context.registerService(IAddressValidator.class.getName(), addressValidator, null);
-		userDaoTracker = new ServiceTracker(context, UserDAO.class.getName(), this);
-		userDaoTracker.open();
-	}
+    @Override
+    public void start(BundleContext bundleContext) {
+        this.context = bundleContext;
+        serviceRegistration = context.registerService(IAddressValidator.class.getName(), addressValidator, null);
+        userDaoTracker = new ServiceTracker(context, UserDAO.class.getName(), this);
+        userDaoTracker.open();
+    }
 
-	@Override
-	public void stop(BundleContext bundleContext) {
-		serviceRegistration.unregister();
-		userDaoTracker.close();
-	}
+    @Override
+    public void stop(BundleContext bundleContext) {
+        serviceRegistration.unregister();
+        userDaoTracker.close();
+    }
 
-	@Override
-	public Object addingService(ServiceReference serviceReference) {
-		final Object trackedService = context.getService(serviceReference);
-		if (trackedService instanceof UserDAO) {
-			addressValidator.setUserDao((UserDAO) trackedService);
-		}
+    @Override
+    public Object addingService(ServiceReference serviceReference) {
+        final Object trackedService = context.getService(serviceReference);
+        if (trackedService instanceof UserDAO) {
+            addressValidator.setUserDao((UserDAO) trackedService);
+        }
 
-		return trackedService;
-	}
+        return trackedService;
+    }
 
-	@Override
-	public void modifiedService(ServiceReference serviceReference, Object o) {
+    @Override
+    public void modifiedService(ServiceReference serviceReference, Object o) {
 
-	}
+    }
 
-	@Override
-	public void removedService(ServiceReference serviceReference, Object o) {
+    @Override
+    public void removedService(ServiceReference serviceReference, Object o) {
 
-	}
+    }
 }
