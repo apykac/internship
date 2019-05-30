@@ -2,11 +2,14 @@ package internship.services.addressService;
 
 import internship.dao.addressDAO.AddressDAO;
 import internship.models.addressModel.Address;
+import internship.models.addressModel.Addresses;
 import internship.services.addressService.response.AddressServiceResponse;
+import internship.services.addressSort.IAddressSort;
 import internship.validators.addressValidator.IAddressValidator;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 public class AddressServiceImpl implements AddressService {
 
@@ -14,6 +17,7 @@ public class AddressServiceImpl implements AddressService {
 
     private IAddressValidator addressValidator;
     private AddressDAO addressDAO;
+    private IAddressSort addressSort;
 
     void setUserValidator(IAddressValidator addressValidator) {
         this.addressValidator = addressValidator;
@@ -22,6 +26,26 @@ public class AddressServiceImpl implements AddressService {
     void setAddressDAO(AddressDAO addressDAO) {
         this.addressDAO = addressDAO;
     }
+
+    void setAddressSort(IAddressSort addressSort){
+        this.addressSort=addressSort;
+    }
+
+    @POST
+    @Path("/addresses/sort/")
+    public Response sortAddress(Addresses addresses){
+        List<Address> sortedAddressList;
+        if(addressValidator.isValid(addresses.getAddresses())){
+            sortedAddressList=addressSort.sort(addresses.getAddresses());
+        }else {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Введен список с неправильными названиями региона").build();
+        }
+        Addresses sortedListWrapper=new Addresses();
+        sortedListWrapper.setAddresses(sortedAddressList);
+
+        return Response.ok().type("application/xml").entity(sortedListWrapper).build();
+    }
+
 
     @GET
     @Path("/addresses/{id}/")
