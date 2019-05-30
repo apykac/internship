@@ -1,26 +1,15 @@
 -- Database: vskDB
 
--- DROP DATABASE "vskDB";
-
-CREATE DATABASE "vskDB"
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'Russian_Russia.1251'
-    LC_CTYPE = 'Russian_Russia.1251'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1;
-
 CREATE TABLE users
 (
-    user_id         serial NOT NULL,
+    user_id         serial UNIQUE NOT NULL,
     name            text   NOT NULL,
     surname         text   NOT NULL,
     patronymic      text   NOT NULL,
     birthday        text   NOT NULL,
     passport_number bigint NOT NULL,
     income          bigint NOT NULL,
-    CONSTRAINT users_pkey PRIMARY KEY (user_id)
+    CONSTRAINT users_pkey PRIMARY KEY (passport_number)
 );
 
 CREATE TABLE addresses
