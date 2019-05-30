@@ -1,5 +1,6 @@
 package internship.validators.userValidator;
 
+import internship.dao.userDAO.UserDAO;
 import internship.models.userModel.User;
 import internship.validators.userValidator.response.BadUserResponse;
 
@@ -13,7 +14,13 @@ public class UserValidator implements IUserValidator {
     private static final int CURRENT_YEAR = 2019;
     private final static String DATE_FORMAT = "dd-MM-yyyy";
 
+    private UserDAO userDao;
+
     private BadUserResponse badUserResponse;
+
+    void setUserDao(UserDAO userDao) {
+        this.userDao = userDao;
+    }
 
     public boolean isNameValid(String name) {
         if (name == null) {

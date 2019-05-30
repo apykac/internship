@@ -71,6 +71,7 @@ public class UserDatabaseDAO implements UserDAO {
         }
         return null;
     }
+
     @Override
     public User findUserByPassport(Long passport) {
         try (Connection dbConnection = connector.getConnection();
