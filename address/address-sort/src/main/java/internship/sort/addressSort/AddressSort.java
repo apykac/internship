@@ -8,14 +8,8 @@ import java.util.List;
 
 public class AddressSort implements IAddressSort {
 
-    List<Address> addresses=new ArrayList<>();
-    public void initList(){
-        addresses=new ArrayList<>();
-    }
-    //FIXME pls pls
-    public List<Address> sort(Address address) {
-        addresses.add(address);
-        addresses.sort(Comparator.comparing(Address::getRegion));
-        return addresses;
+    public List<Address> sort(List<Address> address) {
+        address.sort(Comparator.comparing(Address::getRegion));
+        return address;
     }
 }

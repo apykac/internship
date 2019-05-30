@@ -80,14 +80,15 @@ public class AddressServiceImpl implements AddressService {
     @POST
     @Path("/addresses/sort/")
     public Response sortAddressed(Addresses addresses) {
-        List<Address> sortedAddress=new ArrayList<>();
-        addressSort.initList();
-        System.out.println(addresses.getAddressList().size());
-        for (Address address : addresses.getAddressList()) {
-            sortedAddress = addressSort.sort(address);
+        System.out.println("in sorted");
+        List<Address> sortedList;
+        if(addressValidator.isValidAddressList(addresses.getAddressList())){
+            sortedList=addressSort.sort(addresses.getAddressList());
+        }else {
+            return Response.status(Response.Status.BAD_REQUEST).entity(addressValidator.getBadAddressListResponse()).build();
         }
         Addresses addresses1=new Addresses();
-        addresses1.setAddressList(sortedAddress);
+        addresses1.setAddressList(sortedList);
         return Response.ok().type("application/xml").entity(addresses1).build();
     }
 
