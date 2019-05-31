@@ -38,7 +38,7 @@ public class AddressServiceImpl implements AddressService {
         if(addressValidator.isValid(addresses.getAddresses())){
             sortedAddressList=addressSort.sort(addresses.getAddresses());
         }else {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Введен список с неправильными названиями региона").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Введен список с неправильными данными.").build();
         }
         Addresses sortedListWrapper=new Addresses();
         sortedListWrapper.setAddresses(sortedAddressList);
