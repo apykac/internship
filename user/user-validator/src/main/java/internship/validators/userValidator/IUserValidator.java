@@ -13,5 +13,9 @@ public interface IUserValidator {
 
     boolean isValid(User user);
 
+    boolean isUserExistsPost(Long passport);
+
+    boolean isUserExistsPut(Long passport, Long passportForUpdate);
+
     BadUserResponse getErrorMessage();
 }

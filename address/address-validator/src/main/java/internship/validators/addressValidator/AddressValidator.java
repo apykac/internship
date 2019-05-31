@@ -1,5 +1,6 @@
 package internship.validators.addressValidator;
 
+import internship.dao.addressDAO.AddressDAO;
 import internship.dao.userDAO.UserDAO;
 import internship.models.addressModel.Address;
 import internship.validators.addressValidator.response.BadAddressResponse;
@@ -9,6 +10,7 @@ import java.util.List;
 public class AddressValidator implements IAddressValidator {
 
     private UserDAO userDao;
+    private AddressDAO addressDAO;
 
     private BadAddressResponse badAddressResponse;
 
@@ -16,10 +18,22 @@ public class AddressValidator implements IAddressValidator {
         this.userDao = userDao;
     }
 
+    void setAddressDao(AddressDAO addressDao) {
+        this.addressDAO = addressDao;
+    }
+
     public void isUserExists(Long userId) {
         if (userDao.findUserById(userId) == null) {
             badAddressResponse.getUserId().add("Пользователь с ID " + userId + " не найден");
         }
+    }
+
+    public boolean isAddressExists(Long addressId) {
+        if (addressDAO.findAddressById(addressId) == null) {
+            badAddressResponse.setAddress("Адрес с таким ID не существует");
+            return false;
+        }
+        return true;
     }
 
     public boolean isCountryValid(String country) {

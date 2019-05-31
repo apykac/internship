@@ -1,5 +1,6 @@
 package internship.validators.userValidator;
 
+import internship.dao.userDAO.UserDAO;
 import internship.models.userModel.User;
 import internship.validators.userValidator.response.BadUserResponse;
 
@@ -13,7 +14,13 @@ public class UserValidator implements IUserValidator {
     private static final int CURRENT_YEAR = 2019;
     private final static String DATE_FORMAT = "dd-MM-yyyy";
 
+    private UserDAO userDao;
+
     private BadUserResponse badUserResponse;
+
+    void setUserDao(UserDAO userDao) {
+        this.userDao = userDao;
+    }
 
     public boolean isNameValid(String name) {
         if (name == null) {
@@ -70,6 +77,25 @@ public class UserValidator implements IUserValidator {
                 badUserResponse.setPassportNumber("В номере пасспорта присутствует символы отличные от цифр");
                 return false;
             }
+        }
+        return true;
+    }
+
+    public boolean isUserExistsPost(Long passport) {
+        if (userDao.findUserByPassport(passport) != null) {
+            badUserResponse.setUser("Пользователь с таким номером паспорта уже существует");
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isUserExistsPut(Long passport, Long passportForUpdate) {
+        if (userDao.findUserByPassport(passport) == null) {
+            badUserResponse.setUser("Пользователь, которого вы пытаетесь отредактировтаь не существует");
+            return false;
+        } else if (!passport.equals(passportForUpdate) && userDao.findUserByPassport(passportForUpdate) != null) {
+            badUserResponse.setUser("Номер пасспорта, который вы пытаетесь установить, уже занят");
+            return false;
         }
         return true;
     }

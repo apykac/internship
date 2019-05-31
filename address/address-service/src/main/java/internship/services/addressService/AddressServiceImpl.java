@@ -51,12 +51,12 @@ public class AddressServiceImpl implements AddressService {
     @Path("/addresses/{id}/")
     public Response getAddress(@PathParam("id") Long id) {
 
-        if (isServicesUp())
+        if (isServicesDown())
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
 
         Address addressFromDB = addressDAO.findAddressById(id);
         if (addressFromDB == null)
-            return Response.status(Response.Status.NO_CONTENT).entity("Адресс с данным ID не найден").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Адресс с данным ID не найден").build();
         else
             return Response.ok().type("application/xml").entity(addressFromDB).build();
     }
@@ -65,7 +65,7 @@ public class AddressServiceImpl implements AddressService {
     @Path("/addresses/")
     public Response addAddress(Address address) {
 
-        if (isServicesUp())
+        if (isServicesDown())
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
 
         if (addressValidator.isValid(address)) {
@@ -80,10 +80,10 @@ public class AddressServiceImpl implements AddressService {
     @Path("/addresses/{id}/")
     public Response updateAddress(@PathParam("id") Long id, Address address) {
 
-        if (isServicesUp())
+        if (isServicesDown())
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
 
-        if (addressValidator.isValid(address)) {
+        if (addressValidator.isValid(address) && addressValidator.isAddressExists(id)) {
             Address updatedAddress = addressDAO.updateAddress(id, address);
             return Response.ok().type("application/xml").entity(updatedAddress).build();
         } else {
@@ -95,14 +95,14 @@ public class AddressServiceImpl implements AddressService {
     @Path("/addresses/{id}/")
     public Response deleteAddress(@PathParam("id") Long id) {
 
-        if (isServicesUp())
+        if (isServicesDown())
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
 
         addressDAO.removeAddress(id);
         return Response.ok().build();
     }
 
-    private boolean isServicesUp() {
+    private boolean isServicesDown() {
         return (!(isAddressValidationUp() &
                 isAddressDAOUp()));
     }

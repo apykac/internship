@@ -51,6 +51,11 @@
             <artifactId>user-model</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>internship</groupId>
+            <artifactId>user-dao</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
