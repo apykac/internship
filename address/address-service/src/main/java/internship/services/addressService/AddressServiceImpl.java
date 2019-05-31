@@ -32,7 +32,7 @@ public class AddressServiceImpl implements AddressService {
 
         Address addressFromDB = addressDAO.findAddressById(id);
         if (addressFromDB == null)
-            return Response.status(Response.Status.NO_CONTENT).entity("Адресс с данным ID не найден").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Адресс с данным ID не найден").build();
         else
             return Response.ok().type("application/xml").entity(addressFromDB).build();
     }
@@ -59,7 +59,7 @@ public class AddressServiceImpl implements AddressService {
         if (isServicesDown())
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
 
-        if (addressValidator.isValid(address)) {
+        if (addressValidator.isValid(address) && addressValidator.isAddressExists(id)) {
             Address updatedAddress = addressDAO.updateAddress(id, address);
             return Response.ok().type("application/xml").entity(updatedAddress).build();
         } else {

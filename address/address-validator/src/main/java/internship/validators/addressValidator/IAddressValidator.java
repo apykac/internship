@@ -7,6 +7,8 @@ public interface IAddressValidator {
 
     void isUserExists(Long userId);
 
+    boolean isAddressExists(Long addressId);
+
     boolean isCountryValid(String country);
 
     boolean isValid(Address address);

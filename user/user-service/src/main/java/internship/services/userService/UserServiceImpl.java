@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
         User userFromDB = userDAO.findUserByPassport(passport);
         if (userFromDB == null) {
-            return Response.status(Response.Status.NO_CONTENT).entity("Пользователь с указанным номером паспорта не найден").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Пользователь с указанным номером паспорта не найден").build();
         } else {
             return Response.ok().type("application/xml").entity(userFromDB).build();
         }
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
         if (isServicesDown())
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(userServiceResponse).build();
 
-        if (userValidator.isValid(user)) {
+        if (userValidator.isValid(user) && userValidator.isUserExistsPut(passport, user.getPassportNumber())) {
             User updatedUser = userDAO.updateUser(passport, user);
             return Response.ok().type("application/xml").entity(updatedUser).build();
         } else
@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
         if (isServicesDown())
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(userServiceResponse).build();
 
-        if (userValidator.isValid(user)) {
+        if (userValidator.isValid(user) && userValidator.isUserExistsPost(user.getPassportNumber())) {
             User newUser = userDAO.createUser(user);
             return Response.ok().type("application/xml").entity(newUser).build();
         } else

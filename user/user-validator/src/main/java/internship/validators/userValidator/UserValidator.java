@@ -81,6 +81,25 @@ public class UserValidator implements IUserValidator {
         return true;
     }
 
+    public boolean isUserExistsPost(Long passport) {
+        if (userDao.findUserByPassport(passport) != null) {
+            badUserResponse.setUser("Пользователь с таким номером паспорта уже существует");
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isUserExistsPut(Long passport, Long passportForUpdate) {
+        if (userDao.findUserByPassport(passport) == null) {
+            badUserResponse.setUser("Пользователь, которого вы пытаетесь отредактировтаь не существует");
+            return false;
+        } else if (!passport.equals(passportForUpdate) && userDao.findUserByPassport(passportForUpdate) != null) {
+            badUserResponse.setUser("Номер пасспорта, который вы пытаетесь установить, уже занят");
+            return false;
+        }
+        return true;
+    }
+
     public boolean isValid(User user) {
         badUserResponse = new BadUserResponse();
         return (isNameValid(user.getName()) &

@@ -6,6 +6,7 @@ import java.util.List;
 
 @XmlRootElement(name = "BadAddressResponse")
 public class BadAddressResponse {
+    private String address;
     private List<String> userId = new LinkedList<>();
     private String country;
     private String city;
@@ -41,6 +42,14 @@ public class BadAddressResponse {
 
     public void setStreet(String street) {
         this.street = street;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
 
