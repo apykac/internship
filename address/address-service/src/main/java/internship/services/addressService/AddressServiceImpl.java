@@ -6,6 +6,7 @@ import internship.models.addressModel.Addresses;
 import internship.services.addressService.response.AddressServiceResponse;
 import internship.services.addressSort.IAddressSort;
 import internship.validators.addressValidator.IAddressValidator;
+import internship.validators.addressValidator.response.ValidationResult;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -35,10 +36,11 @@ public class AddressServiceImpl implements AddressService {
     @Path("/addresses/sort/")
     public Response sortAddress(Addresses addresses){
         List<Address> sortedAddressList;
-        if(addressValidator.isValid(addresses.getAddresses())){
+        ValidationResult vr = addressValidator.validate(addresses.getAddresses());
+        if(vr.isValid()){
             sortedAddressList=addressSort.sort(addresses.getAddresses());
         }else {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Введен список с неправильными данными.").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(vr).build();
         }
         Addresses sortedListWrapper=new Addresses();
         sortedListWrapper.setAddresses(sortedAddressList);
@@ -67,12 +69,12 @@ public class AddressServiceImpl implements AddressService {
 
         if (isServicesUp())
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
-
-        if (addressValidator.isValid(address)) {
+        ValidationResult vr = addressValidator.validate(address);
+        if (vr.isValid()) {
             Address newAddress = addressDAO.createAddress(address);
             return Response.ok().type("application/xml").entity(newAddress).build();
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity(addressValidator.getMessageError()).build();
+            return Response.status(Response.Status.OK).entity(vr).build();
         }
     }
 
@@ -83,11 +85,12 @@ public class AddressServiceImpl implements AddressService {
         if (isServicesUp())
             return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
 
-        if (addressValidator.isValid(address)) {
+        ValidationResult vr = addressValidator.validate(address);
+        if (vr.isValid()) {
             Address updatedAddress = addressDAO.updateAddress(id, address);
             return Response.ok().type("application/xml").entity(updatedAddress).build();
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity(addressValidator.getMessageError()).build();
+            return Response.status(Response.Status.OK).entity(vr).build();
         }
     }
 

@@ -1,21 +1,21 @@
 package internship.validators.addressValidator;
 
 import internship.models.addressModel.Address;
-import internship.validators.addressValidator.response.BadAddressResponse;
+import internship.validators.addressValidator.response.ValidationResult;
 
 import java.util.List;
 
 public interface IAddressValidator {
 
-    void isUserExists(Long userId);
+    /**
+     * Проверяет адрес на корректность заполненных данных.
+     */
+    ValidationResult validate(Address address);
 
-    boolean isCountryValid(String country);
-
-    boolean isValid(Address address);
-
-    boolean isValid(List<Address> addresses);
-
-    BadAddressResponse getMessageError();
+    /**
+     * Проверяет список адресов на корректность.
+     */
+    ValidationResult validate(List<Address> addresses);
 
     boolean isUserDAOUp();
 
