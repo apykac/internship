@@ -75,6 +75,11 @@
             <artifactId>address-service</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>internship</groupId>
+            <artifactId>sort-address</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

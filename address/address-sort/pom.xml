@@ -3,43 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>internship</groupId>
         <artifactId>address</artifactId>
+        <groupId>internship</groupId>
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>address-service</artifactId>
     <packaging>bundle</packaging>
-    <name>AddressService</name>
-    <description>AddressService for VSK internship</description>
+    <name>AddressSort</name>
+    <description>AddressSort for VSK internship</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>internship</groupId>
-            <artifactId>address-model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>internship</groupId>
-            <artifactId>address-validator</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>internship</groupId>
-            <artifactId>address-dao</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>internship</groupId>
-            <artifactId>sort-address</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+    <artifactId>sort-address</artifactId>
     <build>
         <plugins>
             <plugin>
@@ -51,10 +25,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Description>${project.description}</Bundle-Description>
-                        <Bundle-Activator>internship.services.addressService.Activator</Bundle-Activator>
+                        <Bundle-Activator>internship.services.addressSort.Activator</Bundle-Activator>
                         <Export-Package>
-                            org.apache.cxf.endpoint,
-                            org.apache.cxf.jaxrs
+                            internship.services.addressSort
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -70,5 +43,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>internship</groupId>
+            <artifactId>address-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
 
 </project>
