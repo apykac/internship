@@ -1,6 +1,7 @@
 package internship.services.addressService;
 
 import internship.dao.addressDAO.AddressDAO;
+import internship.services.addressSort.IAddressSort;
 import internship.validators.addressValidator.IAddressValidator;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -16,6 +17,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
     private BundleContext context;
     private ServiceTracker validationTracker;
     private ServiceTracker daoTracker;
+    private ServiceTracker sortTracker;
     private Server server = null;
     private final AddressServiceImpl addressService = new AddressServiceImpl();
 
@@ -24,8 +26,10 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
         this.context = bundleContext;
         validationTracker = new ServiceTracker(context, IAddressValidator.class.getName(), this);
         daoTracker = new ServiceTracker(context, AddressDAO.class.getName(), this);
+        sortTracker = new ServiceTracker(context, IAddressSort.class.getName(), this);
         validationTracker.open();
         daoTracker.open();
+        sortTracker.open();
 
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(addressService.getClass());
@@ -41,6 +45,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
             server.destroy();
             server = null;
         }
+        sortTracker.close();
         validationTracker.close();
         daoTracker.close();
         this.context = null;
@@ -55,6 +60,10 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
         }
         if (trackedService instanceof AddressDAO) {
             addressService.setAddressDAO((AddressDAO) trackedService);
+        }
+
+        if(trackedService instanceof IAddressSort){
+            addressService.setAddressSort((IAddressSort) trackedService);
         }
 
         return trackedService;

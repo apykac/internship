@@ -5,6 +5,8 @@ import internship.dao.userDAO.UserDAO;
 import internship.models.addressModel.Address;
 import internship.validators.addressValidator.response.BadAddressResponse;
 
+import java.util.List;
+
 public class AddressValidator implements IAddressValidator {
 
     private UserDAO userDao;
@@ -50,6 +52,19 @@ public class AddressValidator implements IAddressValidator {
             }
         }
         return true;
+    }
+
+    public boolean isValid(List<Address> addresses){
+        for(int i=0;i<addresses.size();i++){
+            if(!isValidForList(addresses.get(i))){
+                addresses.remove(i);
+            }
+        }
+        return addresses.size()!=0;
+    }
+
+    private boolean isValidForList(Address address){
+        return isCountryValid(address.getRegion());
     }
 
     public boolean isValid(Address address) {
