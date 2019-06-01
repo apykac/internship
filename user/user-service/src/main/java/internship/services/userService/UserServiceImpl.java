@@ -2,6 +2,8 @@ package internship.services.userService;
 
 import internship.dao.userDAO.UserDAO;
 import internship.models.userModel.User;
+import internship.models.userModel.Users;
+import internship.services.userFilter.IUserFilter;
 import internship.services.userService.response.UserServiceResponse;
 import internship.validators.userValidator.IUserValidator;
 import org.slf4j.Logger;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * REST-интерфейс для работы с сущностью пользователь
@@ -21,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private IUserValidator userValidator;
     private UserDAO userDAO;
+    private IUserFilter userFilter;
 
     void setUserValidator(IUserValidator userValidator) {
         this.userValidator = userValidator;
@@ -28,6 +32,25 @@ public class UserServiceImpl implements UserService {
 
     void setUserDAO(UserDAO userDAO) {
         this.userDAO = userDAO;
+    }
+
+    void setUserFilter(IUserFilter userFilter) {
+        this.userFilter = userFilter;
+    }
+
+    @POST
+    @Path("/users/filter/")
+    public Response filterUser(Users users) {
+        List<User> filteredUserList;
+        if (userValidator.isListValid(users.getUsers())) {
+            filteredUserList = userFilter.filter(users.getUsers());
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Введен список с неправильными данными.").build();
+        }
+        Users filteredListWrapper = new Users();
+        filteredListWrapper.setUsers(filteredUserList);
+
+        return Response.ok().type("application/xml").entity(filteredListWrapper).build();
     }
 
     /**

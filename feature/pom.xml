@@ -57,6 +57,11 @@
         </dependency>
         <dependency>
             <groupId>internship</groupId>
+            <artifactId>user-filter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>internship</groupId>
             <artifactId>address-model</artifactId>
             <version>${project.version}</version>
         </dependency>

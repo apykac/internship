@@ -1,6 +1,7 @@
 package internship.services.userService;
 
 import internship.dao.userDAO.UserDAO;
+import internship.services.userFilter.IUserFilter;
 import internship.validators.userValidator.IUserValidator;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -18,6 +19,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
     private BundleContext context;
     private ServiceTracker validationTracker;
     private ServiceTracker daoTracker;
+    private ServiceTracker filterTracker;
     private Server server = null;
     private final UserServiceImpl userService = new UserServiceImpl();
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -29,8 +31,10 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 
         validationTracker = new ServiceTracker(context, IUserValidator.class.getName(), this);
         daoTracker = new ServiceTracker(context, UserDAO.class.getName(), this);
+        filterTracker = new ServiceTracker(context, IUserFilter.class.getName(), this);
         validationTracker.open();
         daoTracker.open();
+        filterTracker.open();
 
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(userService.getClass());
@@ -50,6 +54,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
         }
         validationTracker.close();
         daoTracker.close();
+        filterTracker.close();
         this.context = null;
         log.info("Stopped");
     }
@@ -64,6 +69,10 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
         if (trackedService instanceof UserDAO) {
             userService.setUserDAO((UserDAO) trackedService);
         }
+        if (trackedService instanceof IUserFilter) {
+            userService.setUserFilter((IUserFilter) trackedService);
+        }
+
 
         return trackedService;
     }
