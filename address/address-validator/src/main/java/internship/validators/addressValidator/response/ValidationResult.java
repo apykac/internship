@@ -12,14 +12,14 @@ public class ValidationResult {
 
     @XmlElementWrapper(name = "errors")
     @XmlElement(name = "error")
-    private List<String> errors = new LinkedList<>();
+    private List<ValidationError> errors = new LinkedList<>();
 
-    public void addError(String error){
+    public void addError(ValidationError error){
         isValid = false;
         errors.add(error);
     }
 
-    public List<String> getErrors(){return errors;}
+    public List<ValidationError> getErrors(){return errors;}
 
     public boolean isValid() {
         return isValid;
