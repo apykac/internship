@@ -7,6 +7,7 @@ import internship.validators.userValidator.response.BadUserResponse;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class UserValidator implements IUserValidator {
     private static final int MAX_SIZE_NAME = 50;
@@ -98,6 +99,11 @@ public class UserValidator implements IUserValidator {
             return false;
         }
         return true;
+    }
+
+    public boolean isListValid(List<User> users) {
+        users.removeIf(user -> !isValid(user));
+        return users.size() != 0;
     }
 
     public boolean isValid(User user) {
