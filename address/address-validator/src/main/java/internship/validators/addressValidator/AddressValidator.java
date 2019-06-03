@@ -3,8 +3,8 @@ package internship.validators.addressValidator;
 import internship.dao.addressDAO.AddressDAO;
 import internship.dao.userDAO.UserDAO;
 import internship.models.addressModel.Address;
-import internship.models.addressModel.ValidationError;
-import internship.models.addressModel.ValidationResult;
+import internship.validators.addressValidator.models.ValidationError;
+import internship.validators.addressValidator.models.ValidationResult;
 
 import java.util.List;
 import java.util.Set;

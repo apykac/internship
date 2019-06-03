@@ -28,7 +28,7 @@
                         <Bundle-Activator>internship.validators.addressValidator.Activator</Bundle-Activator>
                         <Export-Package>
                             internship.validators.addressValidator,
-                            internship.validators.addressValidator.response
+                            internship.validators.addressValidator.models
                         </Export-Package>
                     </instructions>
                 </configuration>

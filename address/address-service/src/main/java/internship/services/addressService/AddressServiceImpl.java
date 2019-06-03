@@ -6,7 +6,7 @@ import internship.models.addressModel.Addresses;
 import internship.services.addressService.response.AddressServiceResponse;
 import internship.services.addressSort.IAddressSort;
 import internship.validators.addressValidator.IAddressValidator;
-import internship.models.addressModel.ValidationResult;
+import internship.validators.addressValidator.models.ValidationResult;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;

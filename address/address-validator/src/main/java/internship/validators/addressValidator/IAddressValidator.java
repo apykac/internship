@@ -1,7 +1,7 @@
 package internship.validators.addressValidator;
 
 import internship.models.addressModel.Address;
-import internship.models.addressModel.ValidationResult;
+import internship.validators.addressValidator.models.ValidationResult;
 
 import java.util.List;
 

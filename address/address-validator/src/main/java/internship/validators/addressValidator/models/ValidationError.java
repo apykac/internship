@@ -1,4 +1,4 @@
-package internship.models.addressModel;
+package internship.validators.addressValidator.models;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
