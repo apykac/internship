@@ -2,120 +2,207 @@ package internship.validators.userValidator;
 
 import internship.dao.userDAO.UserDAO;
 import internship.models.userModel.User;
-import internship.validators.userValidator.response.BadUserResponse;
+import internship.validators.userValidator.models.ValidationError;
+import internship.validators.userValidator.models.ValidationResult;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class UserValidator implements IUserValidator {
-    private static final int MAX_SIZE_NAME = 50;
-    private static final int MIN_SIZE_NAME = 2;
-    private static final int CURRENT_YEAR = 2019;
-    private final static String DATE_FORMAT = "dd-MM-yyyy";
+
+    //=================================
+    // Smth for services connection
+    //=================================
 
     private UserDAO userDao;
-
-    private BadUserResponse badUserResponse;
 
     void setUserDao(UserDAO userDao) {
         this.userDao = userDao;
     }
 
-    public boolean isNameValid(String name) {
-        if (name == null) {
-            badUserResponse.setNsp("В полях name, surname, patronymic присутствует пустое значение");
-            return false;
+    //========================
+    //  Interface methods
+    //========================
+
+    public ValidationResult validate(User user) {
+        ValidationResult vr = new ValidationResult();
+        if (user == null) {
+            vr.addError(new ValidationError("User", "Значение не должно быть null"));
+            return vr;
         }
-        String tempName = name.trim();
-        if (tempName.length() < MIN_SIZE_NAME || tempName.length() > MAX_SIZE_NAME) {
-            badUserResponse.setNsp(String.format("Слишком маленькая или большая длина name, surname, patronymic (Допустимый размер от %d до %d)", MIN_SIZE_NAME, MAX_SIZE_NAME));
-            return false;
+
+        validateName(vr, user.getName());
+        validateSurname(vr, user.getSurname());
+        validatePatronymic(vr, user.getPatronymic());
+        validateBirthday(vr, user.getBirthday());
+        validatePassportNumber(vr, user.getPassportNumber());
+        validateIncome(vr, user.getIncome());
+        return vr;
+    }
+
+    //TODO: Раньше валидация удаляла некорректные адреса из списка. Теперь не удаляет. Она и не должна, но другой метод мог сломаться (надо проверить).
+    public ValidationResult validate(List<User> users) {
+        ValidationResult vr = new ValidationResult();
+        if (users == null) {
+            vr.addError(new ValidationError("User", "Значение не должно быть null"));
+            return vr;
         }
-        for (int i = 0; i < tempName.length(); i++) {
-            if (!Character.isLetter(tempName.charAt(i))) {
-                badUserResponse.setNsp("В полях name, surname, patronymic встречаются символы отличные от букв");
-                return false;
+        for (User user : users) {
+            ValidationResult vr1 = validate(user);
+            for (int i = 0; i < vr1.getErrors().size(); i++) {
+                ValidationError error = vr1.getErrors().get(i);
+                vr.addError(new ValidationError("user[" + i + "]:" + error.getCause(), error.getMessage()));
             }
         }
-        return true;
+        return vr;
     }
 
-    public boolean isDateBirthdayValid(String birthday) {
-        if (birthday == null) {
-            badUserResponse.setBirthday("Введено пустое значение для даты рождения");
-            return false;
-        }
-        try {
-            DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-            df.setLenient(false);
-            df.parse(birthday);
-        } catch (ParseException e) {
-            badUserResponse.setBirthday("Введен неправильный формат даты(формат должен быть dd-MM-yyyy) или не существующая дата");
-            return false;
-        }
-        String[] a = birthday.split("-");
-        int yearOfBirth = Integer.parseInt(a[2]);
-        if (yearOfBirth <= 1900 || yearOfBirth > CURRENT_YEAR) {
-            badUserResponse.setBirthday("Введенная некорректная дата");
-            return false;
-        }
-        return true;
-    }
+    //========================
+    //  Private methods
+    //========================
 
-    public boolean isPassportNumberValid(Long passport) {
-        if (passport == null) {
-            badUserResponse.setPassportNumber("Пустое значение паспортных данных");
-            return false;
-        }
-        if (passport.toString().length() != 10) {
-            badUserResponse.setPassportNumber("Номер пасспорта должен содержать ровно 10 цифр");
-            return false;
-        }
-        for (int i = 0; i < passport.toString().length(); i++) {
-            if (!Character.isDigit(passport.toString().charAt(i))) {
-                badUserResponse.setPassportNumber("В номере пасспорта присутствует символы отличные от цифр");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean isUserExistsPost(Long passport) {
+    /**
+     * Проверить существует ли пользователь в базе данных
+     *
+     * @param vr       Куда добавлять сообщения об ошибках
+     * @param passport Номер паспорта для проверки
+     */
+    private void validateUserForExistance(ValidationResult vr, Long passport) {
         if (userDao.findUserByPassport(passport) != null) {
-            badUserResponse.setUser("Пользователь с таким номером паспорта уже существует");
-            return false;
+            vr.addError(new ValidationError("User", "Пользователь с таким номером паспорта " + passport + " уже зарегистрирован"));
         }
-        return true;
     }
 
-    public boolean isUserExistsPut(Long passport, Long passportForUpdate) {
-        if (userDao.findUserByPassport(passport) == null) {
-            badUserResponse.setUser("Пользователь, которого вы пытаетесь отредактировтаь не существует");
-            return false;
-        } else if (!passport.equals(passportForUpdate) && userDao.findUserByPassport(passportForUpdate) != null) {
-            badUserResponse.setUser("Номер пасспорта, который вы пытаетесь установить, уже занят");
-            return false;
+    /**
+     * Провалидировать содержимое тега <name></name>
+     *
+     * @param vr   Куда добавлять сообщения об ошибках
+     * @param name Значение для проверки
+     */
+    private void validateName(ValidationResult vr, String name) {
+        validateCommonName(vr, "Name", name);
+    }
+
+    /**
+     * Провалидировать содержимое тега <surname></surname>
+     *
+     * @param vr      Куда добавлять сообщения об ошибках
+     * @param surname Значение для проверки
+     */
+    private void validateSurname(ValidationResult vr, String surname) {
+        validateCommonName(vr, "Surname", surname);
+    }
+
+    /**
+     * Провалидировать содержимое тега <patronymic></patronymic>
+     *
+     * @param vr         Куда добавлять сообщения об ошибках
+     * @param patronymic Значение для проверки
+     */
+    private void validatePatronymic(ValidationResult vr, String patronymic) {
+        validateCommonName(vr, "Patronymic", patronymic);
+    }
+
+    /**
+     * Провалидировать содержимое тега <birthday></birthday>
+     *
+     * @param vr       Куда добавлять сообщения об ошибках
+     * @param birthday Значение для проверки
+     */
+    private void validateBirthday(ValidationResult vr, String birthday) {
+        validateBirthday(vr, "Birthday", birthday);
+    }
+
+    /**
+     * Провалидировать содержимое тега <passportNumber></passportNumber>
+     *
+     * @param vr             Куда добавлять сообщения об ошибках
+     * @param passportNumber Значение для проверки
+     */
+    private void validatePassportNumber(ValidationResult vr, Long passportNumber) {
+        validateCommonNumber(vr, "Passport Number", passportNumber);
+    }
+
+    /**
+     * Провалидировать содержимое тега <income></income>
+     *
+     * @param vr     Куда добавлять сообщения об ошибках
+     * @param income Значение для проверки
+     */
+    private void validateIncome(ValidationResult vr, Long income) {
+        validateCommonNumber(vr, "Income", income);
+    }
+
+    /**
+     * Провалидировать тег Name\Surname\Patronymic. Потому что к ним предъявляются одинаковые требования.
+     *
+     * @param vr    Куда добавлять сообщения об ошибках
+     * @param cause Название валидируемого тега
+     * @param value Значение для проверки
+     */
+    private void validateCommonName(ValidationResult vr, String cause, String value) {
+        if (value == null) {
+            vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
+            return;
         }
-        return true;
+        String trimmedValue = value.trim();
+        if (trimmedValue.length() < 3 || trimmedValue.length() > 50) {
+            vr.addError(new ValidationError(cause, "Значение не может быть короче 3 символов или длиннее 50 символов"));
+            return;
+        }
+        for (int i = 0; i < trimmedValue.length(); i++) {
+            if (Character.isDigit(trimmedValue.charAt(i))) {
+                vr.addError(new ValidationError(cause, "Значение не может содержать цифры"));
+                return;
+            }
+        }
     }
 
-    public boolean isListValid(List<User> users) {
-        users.removeIf(user -> !isValid(user));
-        return users.size() != 0;
+    /**
+     * Провалидировать тег passportNumber\income. Потому что к ним предъявляются одинаковые требования.
+     *
+     * @param vr    Куда добавлять сообщения об ошибках
+     * @param cause Название валидируемого тега
+     * @param value Значение для проверки
+     */
+    private void validateCommonNumber(ValidationResult vr, String cause, Long value) {
+        if (value == null || value.toString().length() == 0) {
+            vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
+            return;
+        }
+        String trimmedNumber = value.toString().trim();
+        try {
+            int num = Integer.parseInt(trimmedNumber);
+            if (num <= 0) {
+                vr.addError(new ValidationError(cause, "Значение должно быть положительным"));
+            }
+        } catch (Exception e) {
+            vr.addError(new ValidationError(cause, "Значение должно быть числом"));
+        }
     }
 
-    public boolean isValid(User user) {
-        badUserResponse = new BadUserResponse();
-        return (isNameValid(user.getName()) &
-                isNameValid(user.getSurname()) &
-                isNameValid(user.getPatronymic()) &
-                isDateBirthdayValid(user.getBirthday()) &
-                isPassportNumberValid(user.getPassportNumber()));
-    }
+    /**
+     * Провалидировать тег Birthday.
+     *
+     * @param vr    Куда добавлять сообщения об ошибках
+     * @param cause Название валидируемого тега
+     * @param value Значение для проверки
+     */
+    private void validateBirthday(ValidationResult vr, String cause, String value) {
+        if (value == null) {
+            vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
+            return;
+        }
 
-    public BadUserResponse getErrorMessage() {
-        return badUserResponse;
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate date = LocalDate.parse(value, formatter);
+            if (date.getYear() < 1900 || date.getYear() > 2019) {
+                vr.addError(new ValidationError(cause, "Введенная некорректная дата (год не может быть меньше 1900 или больше 2019"));
+            }
+        } catch (Exception e) {
+            vr.addError(new ValidationError(cause, "Введен неправильный формат даты(формат должен быть dd-MM-yyyy) или не существующая дата"));
+        }
     }
 }

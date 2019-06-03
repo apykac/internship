@@ -81,7 +81,7 @@ public class AddressValidator implements IAddressValidator {
      * @param vr       Куда добавлять сообщения об ошибках
      * @param passport Номер паспорта для проверки
      */
-    private void validateUserForExistance(ValidationResult vr, Long passport) {
+    private void validateUserForExistence(ValidationResult vr, Long passport) {
         if (userDao.findUserByPassport(passport) == null) {
             vr.addError(new ValidationError("User", "Пользователь с номером паспорта " + passport + " не найден"));
         }
@@ -100,7 +100,7 @@ public class AddressValidator implements IAddressValidator {
         }
         int userNum = 0;
         for (Long passportNumber : users) {
-            validateUserForExistance(vr, passportNumber);
+            validateUserForExistence(vr, passportNumber);
         }
     }
 
@@ -201,9 +201,9 @@ public class AddressValidator implements IAddressValidator {
             vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
             return;
         }
-        String trimedHouseNumber = value.trim();
+        String trimmedNumber = value.trim();
         try {
-            int num = Integer.parseInt(trimedHouseNumber);
+            int num = Integer.parseInt(trimmedNumber);
             if (num <= 0) {
                 vr.addError(new ValidationError(cause, "Значение должно быть положительным"));
             }
