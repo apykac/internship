@@ -1,5 +1,6 @@
 package internship.validators.addressValidator;
 
+import internship.dao.addressDAO.AddressDAO;
 import internship.dao.userDAO.UserDAO;
 import internship.models.addressModel.Address;
 import internship.validators.addressValidator.response.ValidationError;
@@ -13,6 +14,10 @@ public class AddressValidator implements IAddressValidator {
     private UserDAO userDao;
     void setUserDao(UserDAO userDao) {
         this.userDao = userDao;
+    }
+    private AddressDAO addressDao;
+    void setAddressDao(AddressDAO addressDao) {
+        this.addressDao = addressDao;
     }
 
     //========================
