@@ -101,7 +101,7 @@ public class AddressDatabaseDAO implements AddressDAO {
                 saveUserId(address, id, userStatement);
 
                 deleteDuplicate.setLong(1, id);
-                deleteDuplicate.setArray(2, dbConnection.createArrayOf("bigint", address.getUserId().toArray()));
+                deleteDuplicate.setArray(2, dbConnection.createArrayOf("bigint", address.getUsers().toArray()));
                 deleteDuplicate.execute();
 
                 return address;
@@ -189,11 +189,11 @@ public class AddressDatabaseDAO implements AddressDAO {
 
     private void saveUserId(Address address, Long id, PreparedStatement userStatement) throws SQLException {
         userStatement.setLong(2, id);
-        for (Long userID : address.getUserId()) {
+        for (Long userID : address.getUsers()) {
             userStatement.setLong(1, userID);
             try (ResultSet resultSet = userStatement.executeQuery()) {
                 if (resultSet.next())
-                    address.getUserId().add(resultSet.getLong("user_id"));
+                    address.getUsers().add(resultSet.getLong("user_id"));
             }
         }
 

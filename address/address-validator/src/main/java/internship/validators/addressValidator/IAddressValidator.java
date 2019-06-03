@@ -1,24 +1,27 @@
 package internship.validators.addressValidator;
 
 import internship.models.addressModel.Address;
-import internship.validators.addressValidator.response.BadAddressResponse;
+import internship.validators.addressValidator.models.ValidationResult;
 
 import java.util.List;
 
 public interface IAddressValidator {
 
-    void isUserExists(Long userId);
+    /**
+     * Проверяет адрес на корректность заполнения данных
+     * @param address Адрес для проверки
+     * @return Возвращает результат проверки
+     */
+    ValidationResult validate(Address address);
 
-    boolean isAddressExists(Long addressId);
+    /**
+     * Проверяет список адресов на корректность.
+     * @param addresses Адреса для проверки
+     * @return Возвращает результат проверки
+     */
+    ValidationResult validate(List<Address> addresses);
 
-    boolean isCountryValid(String country);
-
-    boolean isValid(Address address);
-
-    boolean isValid(List<Address> addresses);
-
-    BadAddressResponse getMessageError();
-
+    // TODO: Что это? По логике этого здесь не должно быть.
     boolean isUserDAOUp();
 
 }

@@ -15,8 +15,8 @@ public class Address {
     private String apartmentNumber;
 
     @XmlElementWrapper(name = "Users")
-    @XmlElement(name = "userID")
-    private Set<Long> userId;
+    @XmlElement(name = "user")
+    private Set<Long> users;
 
     public long getId() {
         return id;
@@ -26,12 +26,12 @@ public class Address {
         this.id = id;
     }
 
-    public Set<Long> getUserId() {
-        return userId;
+    public Set<Long> getUsers() {
+        return users;
     }
 
-    public void setUserId(Set<Long> userId) {
-        this.userId = userId;
+    public void setUserId(Set<Long> users) {
+        this.users = users;
     }
 
     public String getCountry() {
@@ -85,9 +85,9 @@ public class Address {
     public Address() {
     }
 
-    public Address(long id, Set<Long> userId, String country, String region, String city, String street, String houseNumber, String apartmentNumber) {
+    public Address(long id, Set<Long> users, String country, String region, String city, String street, String houseNumber, String apartmentNumber) {
         this.id = id;
-        this.userId = userId;
+        this.users = users;
         this.country = country;
         this.region = region;
         this.city = city;
@@ -96,8 +96,8 @@ public class Address {
         this.apartmentNumber = apartmentNumber;
     }
 
-    public Address(Set<Long> userId, String country, String region, String city, String street, String houseNumber, String apartmentNumber) {
-        this.userId = userId;
+    public Address(Set<Long> users, String country, String region, String city, String street, String houseNumber, String apartmentNumber) {
+        this.users = users;
         this.country = country;
         this.region = region;
         this.city = city;
