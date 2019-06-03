@@ -49,6 +49,11 @@
             <artifactId>user-dao</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>internship</groupId>
+            <artifactId>user-filter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

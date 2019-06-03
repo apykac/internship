@@ -19,6 +19,7 @@
         <module>user-service</module>
         <module>user-validator</module>
         <module>user-dao</module>
+        <module>user-filter</module>
     </modules>
 
 </project>

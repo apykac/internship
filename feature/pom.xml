@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>feature</artifactId>
-    <packaging>feature</packaging>
+    <packaging>pom</packaging>
 
     <!--
         1) В dependencies копируем зависимости на все бандлы, которые нужно запустить.
@@ -53,6 +53,11 @@
         <dependency>
             <groupId>internship</groupId>
             <artifactId>user-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>internship</groupId>
+            <artifactId>user-filter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
