@@ -28,22 +28,22 @@ public class AddressServiceImpl implements AddressService {
         this.addressDAO = addressDAO;
     }
 
-    void setAddressSort(IAddressSort addressSort){
-        this.addressSort=addressSort;
+    void setAddressSort(IAddressSort addressSort) {
+        this.addressSort = addressSort;
     }
 
-    public Response sortAddress(Addresses addresses){
+    public Response sortAddress(Addresses addresses) {
         List<Address> sortedAddressList;
         ValidationResult vr = addressValidator.validate(addresses.getAddresses());
-        if(vr.isValid()){
-            sortedAddressList=addressSort.sort(addresses.getAddresses());
+        if (vr.isValid()) {
+            sortedAddressList = addressSort.sort(addresses.getAddresses());
         } else {
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity(vr)
                     .build();
         }
-        Addresses sortedListWrapper=new Addresses();
+        Addresses sortedListWrapper = new Addresses();
         sortedListWrapper.setAddresses(sortedAddressList);
 
         return Response
@@ -52,7 +52,7 @@ public class AddressServiceImpl implements AddressService {
                 .build();
     }
 
-    public Response getAddress( Long id) {
+    public Response getAddress(Long id) {
 
         if (isServicesDown()) {
             return Response

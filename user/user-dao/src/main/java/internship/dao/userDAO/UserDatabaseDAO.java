@@ -16,81 +16,19 @@ public class UserDatabaseDAO implements UserDAO {
 
     private IConnector connector;
 
-    private final String CREATE_USER = "INSERT INTO users " +
-            "(name, surname, patronymic, birthday, passport_number, income) " +
-            "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id, name, surname, patronymic, birthday, passport_number, income";
-
-    private final String GET_USER = "SELECT * FROM users WHERE user_id = ?";
-
-    private final String GET_USER_BY_PASSPORT = "SELECT * FROM users WHERE passport_number = ?";
-
-    private final String UPDATE_USER = "UPDATE users " +
-            "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
-            "WHERE user_id = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income";
-
-    private final String UPDATE_USER_BY_PASSPORT = "UPDATE users " +
-            "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
-            "WHERE passport_number = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income";
-
-    private final String DELETE_USER = "DELETE FROM users WHERE user_id = ?";
-
-    private final String DELETE_USER_BY_PASSPORT = "DELETE FROM users WHERE passport_number = ?";
-
     void setConnector(IConnector connector) {
         this.connector = connector;
     }
 
     @Override
-    public User findUserById(Long id) {
-        try (Connection dbConnection = connector.getConnection();
-             PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_USER)) {
-
-            preparedStatement.setLong(1, id);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new User(
-                            resultSet.getLong("user_id"),
-                            resultSet.getString("name"),
-                            resultSet.getString("surname"),
-                            resultSet.getString("patronymic"),
-                            resultSet.getString("birthday"),
-                            resultSet.getLong("passport_number"),
-                            resultSet.getLong("income")
-                    );
-                }
-            } catch (SQLException e) {
-                log.error("Can't get result set from database");
-                log.error(e.getMessage());
-                System.out.print(e.getMessage());
-            }
-        } catch (SQLException e) {
-            log.error("Can't get user from database");
-            log.error(e.getMessage());
-            System.out.print(e.getMessage());
-        }
-        return null;
-    }
-
-    @Override
     public User findUserByPassport(Long passport) {
         try (Connection dbConnection = connector.getConnection();
-             PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_USER_BY_PASSPORT)) {
+             PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM users WHERE passport_number = ?")) {
 
             preparedStatement.setLong(1, passport);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new User(
-                            resultSet.getLong("user_id"),
-                            resultSet.getString("name"),
-                            resultSet.getString("surname"),
-                            resultSet.getString("patronymic"),
-                            resultSet.getString("birthday"),
-                            resultSet.getLong("passport_number"),
-                            resultSet.getLong("income")
-                    );
-                }
+                return resultSetToUser(resultSet, new User());
             } catch (SQLException e) {
                 log.error("Can't get result set from database");
                 log.error(e.getMessage());
@@ -107,7 +45,9 @@ public class UserDatabaseDAO implements UserDAO {
     @Override
     public User updateUser(Long passport, User user) {
         try (Connection dbConnection = connector.getConnection();
-             PreparedStatement preparedStatement = dbConnection.prepareStatement(UPDATE_USER_BY_PASSPORT)) {
+             PreparedStatement preparedStatement = dbConnection.prepareStatement("UPDATE users " +
+                     "SET name = ?, surname = ?, patronymic = ?, birthday = ?, passport_number = ?, income = ? " +
+                     "WHERE passport_number = ? RETURNING user_id, name, surname, patronymic, birthday, passport_number, income")) {
 
             setStatement(user, preparedStatement);
             preparedStatement.setLong(7, passport);
@@ -131,7 +71,9 @@ public class UserDatabaseDAO implements UserDAO {
     @Override
     public User createUser(User user) {
         try (Connection dbConnection = connector.getConnection();
-             PreparedStatement preparedStatement = dbConnection.prepareStatement(CREATE_USER)) {
+             PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO users " +
+                     "(name, surname, patronymic, birthday, passport_number, income) " +
+                     "VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id, name, surname, patronymic, birthday, passport_number, income")) {
 
             setStatement(user, preparedStatement);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -152,7 +94,7 @@ public class UserDatabaseDAO implements UserDAO {
     @Override
     public void removeUser(Long passport) {
         try (Connection dbConnection = connector.getConnection();
-             PreparedStatement preparedStatement = dbConnection.prepareStatement(DELETE_USER_BY_PASSPORT)) {
+             PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM users WHERE passport_number = ?")) {
             preparedStatement.setLong(1, passport);
             preparedStatement.execute();
 
@@ -172,7 +114,6 @@ public class UserDatabaseDAO implements UserDAO {
             user.setBirthday(resultSet.getString("birthday"));
             user.setPassportNumber(resultSet.getLong("passport_number"));
             user.setIncome(resultSet.getLong("income"));
-
             return user;
         } else
             return null;

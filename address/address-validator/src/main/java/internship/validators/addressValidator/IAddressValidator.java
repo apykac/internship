@@ -9,6 +9,7 @@ public interface IAddressValidator {
 
     /**
      * Проверяет адрес на корректность заполнения данных
+     *
      * @param address Адрес для проверки
      * @return Возвращает результат проверки
      */
@@ -16,6 +17,7 @@ public interface IAddressValidator {
 
     /**
      * Проверяет список адресов на корректность.
+     *
      * @param addresses Адреса для проверки
      * @return Возвращает результат проверки
      */

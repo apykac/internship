@@ -1,12 +1,8 @@
 package internship.validators.addressValidator.models;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.LinkedList;
-import java.util.List;
 
-@XmlRootElement(name="Error")
+@XmlRootElement(name = "Error")
 public class ValidationError {
     private String cause;
     private String message;
@@ -15,8 +11,7 @@ public class ValidationError {
     }
 
     /**
-     *
-     * @param cause Место возникновения ошибки
+     * @param cause   Место возникновения ошибки
      * @param message Сообщение об ошибке
      */
     public ValidationError(String cause, String message) {

@@ -16,10 +16,13 @@ public class AddressValidator implements IAddressValidator {
     //=================================
 
     private UserDAO userDao;
+
     void setUserDao(UserDAO userDao) {
         this.userDao = userDao;
     }
+
     private AddressDAO addressDao;
+
     void setAddressDao(AddressDAO addressDao) {
         this.addressDao = addressDao;
     }
@@ -30,7 +33,7 @@ public class AddressValidator implements IAddressValidator {
 
     public ValidationResult validate(Address address) {
         ValidationResult vr = new ValidationResult();
-        if (address==null){
+        if (address == null) {
             vr.addError(new ValidationError("Address", "Значение не должно быть null"));
             return vr;
         }
@@ -45,17 +48,17 @@ public class AddressValidator implements IAddressValidator {
     }
 
     //TODO: Раньше валидация удаляла некорректные адреса из списка. Теперь не удаляет. Она и не должна, но другой метод мог сломаться (надо проверить).
-    public ValidationResult validate(List<Address> addresses){
+    public ValidationResult validate(List<Address> addresses) {
         ValidationResult vr = new ValidationResult();
-        if (addresses==null){
+        if (addresses == null) {
             vr.addError(new ValidationError("Address", "Значение не должно быть null"));
             return vr;
         }
-        for(Address address:addresses){
+        for (Address address : addresses) {
             ValidationResult vr1 = validate(address);
-            for (int i = 0; i<vr1.getErrors().size(); i++){
+            for (int i = 0; i < vr1.getErrors().size(); i++) {
                 ValidationError error = vr1.getErrors().get(i);
-                vr.addError(new ValidationError("address["+i+"]:"+error.getCause(), error.getMessage()));
+                vr.addError(new ValidationError("address[" + i + "]:" + error.getCause(), error.getMessage()));
             }
         }
         return vr;
@@ -67,7 +70,6 @@ public class AddressValidator implements IAddressValidator {
     }
 
 
-
     //========================
     //  Private methods
     //========================
@@ -75,22 +77,24 @@ public class AddressValidator implements IAddressValidator {
 
     /**
      * Проверить существует ли пользователь в базе данных
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr       Куда добавлять сообщения об ошибках
      * @param passport Номер паспорта для проверки
      */
     private void validateUserForExistance(ValidationResult vr, Long passport) {
         if (userDao.findUserByPassport(passport) == null) {
-            vr.addError(new ValidationError("User","Пользователь с номером паспорта " + passport + " не найден"));
+            vr.addError(new ValidationError("User", "Пользователь с номером паспорта " + passport + " не найден"));
         }
     }
 
     /**
      * Провалидировать содержимое тега <Users></Users>
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr    Куда добавлять сообщения об ошибках
      * @param users Список пользователей для проверки
      */
-    private void validateUsers(ValidationResult vr, Set<Long> users){
-        if (users==null || users.size()==0){
+    private void validateUsers(ValidationResult vr, Set<Long> users) {
+        if (users == null || users.size() == 0) {
             vr.addError(new ValidationError("Users", "Адрес должен иметь как минимум одного зарегестрированного в нём пользователя"));
             return;
         }
@@ -102,7 +106,8 @@ public class AddressValidator implements IAddressValidator {
 
     /**
      * Провалидировать содержимое тега <country></country>
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr      Куда добавлять сообщения об ошибках
      * @param country Значение для проверки
      */
     private void validateCountry(ValidationResult vr, String country) {
@@ -111,7 +116,8 @@ public class AddressValidator implements IAddressValidator {
 
     /**
      * Провалидировать содержимое тега <region></region>
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr     Куда добавлять сообщения об ошибках
      * @param region Значение для проверки
      */
     private void validateRegion(ValidationResult vr, String region) {
@@ -120,7 +126,8 @@ public class AddressValidator implements IAddressValidator {
 
     /**
      * Провалидировать содержимое тега <city></city>
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr   Куда добавлять сообщения об ошибках
      * @param city Значение для проверки
      */
     private void validateCity(ValidationResult vr, String city) {
@@ -129,7 +136,8 @@ public class AddressValidator implements IAddressValidator {
 
     /**
      * Провалидировать содержимое тега <street></street>
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr     Куда добавлять сообщения об ошибках
      * @param street Значение для проверки
      */
     private void validateStreet(ValidationResult vr, String street) {
@@ -138,36 +146,39 @@ public class AddressValidator implements IAddressValidator {
 
     /**
      * Провалидировать содержимое тега <houseNumber></houseNumber>
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr          Куда добавлять сообщения об ошибках
      * @param houseNumber Значение для проверки
      */
-    private void validateHouseNumber(ValidationResult vr, String houseNumber){
+    private void validateHouseNumber(ValidationResult vr, String houseNumber) {
         validateCommonNumber(vr, "houseNumber", houseNumber);
     }
 
     /**
      * Провалидировать содержимое тега <apartmentNumber></apartmentNumber>
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr              Куда добавлять сообщения об ошибках
      * @param apartmentNumber Значение для проверки
      */
-    private void validateApartmentNumber(ValidationResult vr, String apartmentNumber){
+    private void validateApartmentNumber(ValidationResult vr, String apartmentNumber) {
         validateCommonNumber(vr, "apartmentNumber", apartmentNumber);
     }
 
     /**
      * Провалидировать тег Country\Region\City\Street. Потому что к ним предъявляются одинаковые требования.
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr    Куда добавлять сообщения об ошибках
      * @param cause Название валидируемого тега
      * @param value Значение для проверки
      */
-    private void validateCommonLocation(ValidationResult vr, String cause, String value){
+    private void validateCommonLocation(ValidationResult vr, String cause, String value) {
         if (value == null) {
-            vr.addError(new ValidationError(cause,"Значение не может быть пустым"));
+            vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
             return;
         }
         String trimedValue = value.trim();
         if (trimedValue.length() < 3) {
-            vr.addError(new ValidationError(cause,"Значение не может быть короче 3 символов"));
+            vr.addError(new ValidationError(cause, "Значение не может быть короче 3 символов"));
             return;
         }
         for (int i = 0; i < trimedValue.length(); i++) {
@@ -180,23 +191,23 @@ public class AddressValidator implements IAddressValidator {
 
     /**
      * Провалидировать тег houseNumber\apartmentNumber. Потому что к ним предъявляются одинаковые требования.
-     * @param vr Куда добавлять сообщения об ошибках
+     *
+     * @param vr    Куда добавлять сообщения об ошибках
      * @param cause Название валидируемого тега
      * @param value Значение для проверки
      */
-    private void validateCommonNumber(ValidationResult vr, String cause, String value){
-        if (value==null || value.length()==0){
+    private void validateCommonNumber(ValidationResult vr, String cause, String value) {
+        if (value == null || value.length() == 0) {
             vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
             return;
         }
         String trimedHouseNumber = value.trim();
         try {
             int num = Integer.parseInt(trimedHouseNumber);
-            if (num<=0){
+            if (num <= 0) {
                 vr.addError(new ValidationError(cause, "Значение должно быть положительным"));
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             vr.addError(new ValidationError(cause, "Значение должно быть числом"));
         }
     }

@@ -10,8 +10,8 @@ public class AddressSort implements IAddressSort {
     public List<Address> sort(List<Address> address) {
         address.sort(Comparator.comparing(Address::getRegion));
         // TODO: Кураторами написано, что этот цикл не нужен
-        for(int i=0; i<address.size();i++){
-            address.get(i).setId(i+1);
+        for (int i = 0; i < address.size(); i++) {
+            address.get(i).setId(i + 1);
         }
         return address;
     }

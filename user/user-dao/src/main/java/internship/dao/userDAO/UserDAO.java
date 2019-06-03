@@ -3,7 +3,6 @@ package internship.dao.userDAO;
 import internship.models.userModel.User;
 
 public interface UserDAO {
-    User findUserById(Long id);
 
     User findUserByPassport(Long passport);
 
