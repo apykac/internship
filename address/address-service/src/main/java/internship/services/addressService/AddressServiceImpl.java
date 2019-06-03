@@ -4,11 +4,11 @@ import internship.dao.addressDAO.AddressDAO;
 import internship.models.addressModel.Address;
 import internship.models.addressModel.Addresses;
 import internship.services.addressService.response.AddressServiceResponse;
+import internship.services.addressService.response.ErrorResponse;
 import internship.services.addressSort.IAddressSort;
 import internship.validators.addressValidator.IAddressValidator;
 import internship.validators.addressValidator.models.ValidationResult;
 
-import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -32,77 +32,112 @@ public class AddressServiceImpl implements AddressService {
         this.addressSort=addressSort;
     }
 
-    @POST
-    @Path("/addresses/sort/")
     public Response sortAddress(Addresses addresses){
         List<Address> sortedAddressList;
         ValidationResult vr = addressValidator.validate(addresses.getAddresses());
         if(vr.isValid()){
             sortedAddressList=addressSort.sort(addresses.getAddresses());
-        }else {
-            return Response.status(Response.Status.BAD_REQUEST).entity(vr).build();
+        } else {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(vr)
+                    .build();
         }
         Addresses sortedListWrapper=new Addresses();
         sortedListWrapper.setAddresses(sortedAddressList);
 
-        return Response.ok().type("application/xml").entity(sortedListWrapper).build();
+        return Response
+                .ok()
+                .entity(sortedListWrapper)
+                .build();
     }
 
+    public Response getAddress( Long id) {
 
-    @GET
-    @Path("/addresses/{id}/")
-    public Response getAddress(@PathParam("id") Long id) {
-
-        if (isServicesDown())
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
+        if (isServicesDown()) {
+            return Response
+                    .status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity(addressServiceResponse)
+                    .build();
+        }
 
         Address addressFromDB = addressDAO.findAddressById(id);
-        if (addressFromDB == null)
-            return Response.status(Response.Status.BAD_REQUEST).entity("Адресс с данным ID не найден").build();
-        else
-            return Response.ok().type("application/xml").entity(addressFromDB).build();
-    }
-
-    @POST
-    @Path("/addresses/")
-    public Response addAddress(Address address) {
-
-        if (isServicesDown())
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
-        ValidationResult vr = addressValidator.validate(address);
-        if (vr.isValid()) {
-            Address newAddress = addressDAO.createAddress(address);
-            return Response.ok().type("application/xml").entity(newAddress).build();
+        if (addressFromDB == null) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(new ErrorResponse(ErrorResponse.NO_ADDRESS_WITH_SUCH_ID))
+                    .build();
         } else {
-            return Response.status(Response.Status.OK).entity(vr).build();
+            return Response
+                    .ok()
+                    .entity(addressFromDB)
+                    .build();
+
         }
     }
 
-    @PUT
-    @Path("/addresses/{id}/")
-    public Response updateAddress(@PathParam("id") Long id, Address address) {
+    public Response addAddress(Address address) {
 
-        if (isServicesDown())
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
+        if (isServicesDown()) {
+            return Response
+                    .status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity(addressServiceResponse)
+                    .build();
+        }
+
+        ValidationResult vr = addressValidator.validate(address);
+        if (vr.isValid()) {
+            Address newAddress = addressDAO.createAddress(address);
+            return Response
+                    .ok()
+                    .entity(newAddress)
+                    .build();
+        } else {
+            return Response
+                    .ok()
+                    .entity(vr)
+                    .build();
+        }
+    }
+
+    public Response updateAddress(Long id, Address address) {
+
+        if (isServicesDown()) {
+            return Response
+                    .status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity(addressServiceResponse)
+                    .build();
+        }
 
         ValidationResult vr = addressValidator.validate(address);
         if (vr.isValid()) {
             Address updatedAddress = addressDAO.updateAddress(id, address);
-            return Response.ok().type("application/xml").entity(updatedAddress).build();
+            return Response
+                    .ok()
+                    .entity(updatedAddress)
+                    .build();
         } else {
-            return Response.status(Response.Status.OK).entity(vr).build();
+            return Response
+                    .ok()
+                    .entity(vr)
+                    .build();
         }
     }
 
-    @DELETE
-    @Path("/addresses/{id}/")
-    public Response deleteAddress(@PathParam("id") Long id) {
+    public Response deleteAddress(Long id) {
 
-        if (isServicesDown())
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(addressServiceResponse).build();
+        if (isServicesDown()) {
+            return Response
+                    .status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity(addressServiceResponse)
+                    .build();
+        }
 
         addressDAO.removeAddress(id);
-        return Response.ok().build();
+
+        return Response
+                .ok()
+                .build();
     }
 
     private boolean isServicesDown() {
