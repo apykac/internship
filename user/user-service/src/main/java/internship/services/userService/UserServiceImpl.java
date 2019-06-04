@@ -34,13 +34,13 @@ public class UserServiceImpl implements UserService {
 
     public Response filterUser(Users users) {
         List<User> filteredUserList;
-        ValidationResult vr = userValidator.validate(users.getUsers());
-        if (vr.isValid()) {
+        userValidator.removeInvalidUsers(users.getUsers());
+        if (users.getUsers().size()!=0) {
             filteredUserList = userFilter.filter(users.getUsers());
         } else {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(vr)
+                    .entity("<Error>Не было получено ни одного корректного адреса для сортировки</Error>")
                     .build();
         }
         Users filteredListWrapper = new Users();

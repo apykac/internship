@@ -22,4 +22,10 @@ public interface IUserValidator {
      * @return Возвращает результат проверки
      */
     ValidationResult validate(List<User> users);
+
+    /**
+     * Удаляет из списка пользователей невалидные
+     * @param users Пользователи для проверки
+     */
+    void removeInvalidUsers(List<User> users);
 }

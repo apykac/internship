@@ -29,7 +29,10 @@ public interface IAddressValidator {
      */
     void removeInvalidAddresses(List<Address> addresses);
 
-    // TODO: Что это? По логике этого здесь не должно быть.
+    /**
+     * Проверяет имеется ли у валидатора ссылка на сервис user-dao
+     * @return Возвращает true, если всё в порядке
+     */
     boolean isUserDAOUp();
 
 }
