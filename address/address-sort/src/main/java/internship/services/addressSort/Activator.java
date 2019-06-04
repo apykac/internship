@@ -9,7 +9,6 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext bundleContext) throws Exception {
-        System.out.println("bundle AddressSort started");
         sr = bundleContext.registerService(IAddressSort.class.getName(), new AddressSort(), null);
     }
 

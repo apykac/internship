@@ -13,6 +13,11 @@ public interface AddressDAO {
      */
     Address findAddressById(Long id);
 
+    /**
+     *Ищет в базе данных адреса по паспортным данным пользователя
+     * @param passport Паспортные данные пользователя
+     * @return Список адресов с такими паспортными данными, или null если нет зарегистрированных адресов с такими паспортными данными
+     */
     Addresses findAddressesByUserPassport(Long passport);
 
     /**

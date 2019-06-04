@@ -126,6 +126,12 @@ public class UserServiceImpl implements UserService {
 
         ValidationResult vr = userValidator.validate(user);
         if (vr.isValid()) {
+            if(userDAO.findUserByPassport(user.getPassportNumber())!=null){
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .entity("<Error>Номер пасспорта, который вы пытаетесь установить, уже занят</Error>")
+                        .build();
+            }
             User newUser = userDAO.createUser(user);
             return Response
                     .ok()
@@ -133,7 +139,7 @@ public class UserServiceImpl implements UserService {
                     .build();
         } else {
             return Response
-                    .ok()
+                    .status(Response.Status.BAD_REQUEST)
                     .entity(vr)
                     .build();
         }
