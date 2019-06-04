@@ -52,7 +52,7 @@ interface UserService {
      */
     @DELETE
     @Path("/users/{passport}/")
-    Response deleteUser(Long passport);
+    Response deleteUser(@PathParam("passport") Long passport);
 
 
     /**

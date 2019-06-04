@@ -172,18 +172,13 @@ public class UserValidator implements IUserValidator {
      * @param value Значение для проверки
      */
     private void validateCommonNumber(ValidationResult vr, String cause, Long value) {
-        if (value == null || value.toString().length() == 0) {
+        if (value == null) {
             vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
             return;
         }
-        String trimmedNumber = value.toString().trim();
-        try {
-            int num = Integer.parseInt(trimmedNumber);
-            if (num <= 0) {
-                vr.addError(new ValidationError(cause, "Значение должно быть положительным"));
-            }
-        } catch (Exception e) {
+        if (value.toString().length() == 0) {
             vr.addError(new ValidationError(cause, "Значение должно быть числом"));
+            return;
         }
     }
 
