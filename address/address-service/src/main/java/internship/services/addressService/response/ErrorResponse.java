@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ErrorResponse {
 
     public static final String NO_ADDRESS_WITH_SUCH_ID = "No address with specified id found.";
+    public static final String NO_ADDRESSES_WITH_SUCH_PASSPORT = "No address with specified passport found.";
 
     private String message = "Unknown error occurred.";
 

@@ -10,7 +10,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class AddressDatabaseDAO implements AddressDAO {
@@ -61,6 +63,34 @@ public class AddressDatabaseDAO implements AddressDAO {
 
     @Override
     public Addresses findAddressesByUserPassport(Long passport) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM addresses " +
+                             "LEFT JOIN user_address ON user_address.address_id = addresses.address_id " +
+                             "WHERE user_address.user_passport_number = ?",
+                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+
+            preparedStatement.setLong(1, passport);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                Addresses addresses = new Addresses();
+                List<Address> addressList = new ArrayList<>();
+                while (resultSet.next()) {
+                    addressList.add(findAddressById(resultSet.getLong("address_id")));
+                }
+                addresses.setAddresses(addressList);
+
+                return addresses;
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
+        } catch (SQLException e) {
+            log.error("Can't get address from database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+        }
         return null;
     }
 
