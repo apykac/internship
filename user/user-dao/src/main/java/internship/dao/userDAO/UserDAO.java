@@ -5,9 +5,10 @@ import internship.models.userModel.User;
 public interface UserDAO {
     /**
      * Ищет в БД данные о пользователе по пасспортным данным
+     *
      * @param passport пасспортные данные пользователя
      * @return User если существует в БД пользователь с данным id, иначе null
-     * */
+     */
     User findUserByPassport(Long passport);
 
     /**
@@ -17,6 +18,7 @@ public interface UserDAO {
      * @return User если существует в БД с данным id, иначе null
      */
     User updateUser(Long passport, User user);
+
     /**
      * Сохраняет пользователя в БД
      * @param user данные о пользователе

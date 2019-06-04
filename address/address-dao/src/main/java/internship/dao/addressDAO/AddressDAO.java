@@ -1,15 +1,19 @@
 package internship.dao.addressDAO;
 
 import internship.models.addressModel.Address;
+import internship.models.addressModel.Addresses;
 
 public interface AddressDAO {
 
     /**
      * Метод ищет в БД адрес по id
+     *
      * @param id адреса
      * @return Address если существует в БД адрес с данным id, иначе null
      */
     Address findAddressById(Long id);
+
+    Addresses findAddressesByUserPassport(Long passport);
 
     /**
      * Меняет данные о адресе у указаного id

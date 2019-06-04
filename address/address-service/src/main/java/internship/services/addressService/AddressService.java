@@ -20,6 +20,17 @@ interface AddressService {
     Response getAddress(@PathParam("id") Long id);
 
     /**
+     * Получить адресы по номеру пасспорта пользователя.
+     *
+     * @param passport Номер пасспорта пользователя, для которого запрашиваются адресы
+     * @return Возвращает искомый адрес либо сообщение об ошибке. Выходные данные в формате XML.
+     */
+    @GET
+    @Path("/addresses/list/{passport}/")
+    @Produces("application/xml")
+    Response getAddressesForUser(@PathParam("passport") Long passport);
+
+    /**
      * Создать новый адрес.
      *
      * @param address Адрес для создания в формате XML.

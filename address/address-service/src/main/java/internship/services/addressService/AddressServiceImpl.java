@@ -79,6 +79,30 @@ public class AddressServiceImpl implements AddressService {
         }
     }
 
+    public Response getAddressesForUser(Long passport) {
+
+        if (isServicesDown()) {
+            return Response
+                    .status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity(addressServiceResponse)
+                    .build();
+        }
+
+        Addresses addressesFromDB = addressDAO.findAddressesByUserPassport(passport);
+        if (addressesFromDB == null) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(new ErrorResponse(ErrorResponse.NO_ADDRESSES_WITH_SUCH_PASSPORT))
+                    .build();
+        } else {
+            return Response
+                    .ok()
+                    .entity(addressesFromDB)
+                    .build();
+
+        }
+    }
+
     public Response addAddress(Address address) {
 
         if (isServicesDown()) {
@@ -91,7 +115,7 @@ public class AddressServiceImpl implements AddressService {
         ValidationResult vr = addressValidator.validate(address);
         if (vr.isValid()) {
             Address newAddress = addressDAO.createAddress(address);
-            if (newAddress==null){
+            if (newAddress == null) {
                 return Response
                         .ok()
                         .entity("<Error>Не удалось создать адрес.</Error>")

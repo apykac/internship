@@ -2,6 +2,7 @@ package internship.dao.addressDAO;
 
 import internship.connectors.postgresConnector.IConnector;
 import internship.models.addressModel.Address;
+import internship.models.addressModel.Addresses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +10,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class AddressDatabaseDAO implements AddressDAO {
@@ -36,15 +39,48 @@ public class AddressDatabaseDAO implements AddressDAO {
 
                 Address address = new Address();
                 resultSetToAddress(resultSet, address);
-                Set<Long> userIDs = new HashSet<>();
+                Set<Long> userPassports = new HashSet<>();
                 while (resultSet.next()) {
-                    Long userId = resultSet.getLong("user_id");
+                    Long userId = resultSet.getLong("user_passport_number");
                     if (!resultSet.wasNull())
-                        userIDs.add(userId);
+                        userPassports.add(userId);
                 }
-                address.setUserId(userIDs);
+                address.setUsers(userPassports);
 
                 return address;
+            } catch (SQLException e) {
+                log.error("Can't get result set from database");
+                log.error(e.getMessage());
+                System.out.print(e.getMessage());
+            }
+        } catch (SQLException e) {
+            log.error("Can't get address from database");
+            log.error(e.getMessage());
+            System.out.print(e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public Addresses findAddressesByUserPassport(Long passport) {
+        try (Connection dbConnection = connector.getConnection();
+             PreparedStatement preparedStatement = dbConnection.prepareStatement("SELECT * FROM addresses " +
+                             "LEFT JOIN user_address ON user_address.address_id = addresses.address_id " +
+                             "WHERE user_address.user_passport_number = ?",
+                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+
+            preparedStatement.setLong(1, passport);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                Addresses addresses = new Addresses();
+                List<Address> addressList = new ArrayList<>();
+                while (resultSet.next()) {
+                    addressList.add(findAddressById(resultSet.getLong("address_id")));
+                }
+                addresses.setAddresses(addressList);
+
+                return addresses;
             } catch (SQLException e) {
                 log.error("Can't get result set from database");
                 log.error(e.getMessage());
@@ -65,9 +101,9 @@ public class AddressDatabaseDAO implements AddressDAO {
                              "SET country = ?, region = ?, city = ?, street = ?, house_number = ?, apartment_number = ? " +
                              "WHERE address_id = ? RETURNING address_id, country, region, city, street, house_number, apartment_number",
                      ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-             PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_id, address_id) " +
-                     "VALUES (?, ?) ON CONFLICT (user_id, address_id) DO NOTHING RETURNING user_id");
-             PreparedStatement deleteDuplicate = dbConnection.prepareStatement("DELETE FROM user_address WHERE address_id = ? AND NOT user_id = ANY(?)")) {
+             PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_passport_number, address_id) " +
+                     "VALUES (?, ?) ON CONFLICT (user_passport_number, address_id) DO NOTHING RETURNING user_passport_number");
+             PreparedStatement deleteDuplicate = dbConnection.prepareStatement("DELETE FROM user_address WHERE address_id = ? AND NOT user_passport_number = ANY(?)")) {
 
             setStatement(address, addressStatement);
             addressStatement.setLong(7, id);
@@ -102,8 +138,8 @@ public class AddressDatabaseDAO implements AddressDAO {
                              "(country, region, city, street, house_number, apartment_number) " +
                              "VALUES (?, ?, ?, ?, ?, ?) RETURNING address_id, country, region, city, street, house_number, apartment_number",
                      ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-             PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_id, address_id) " +
-                     "VALUES (?, ?) ON CONFLICT (user_id, address_id) DO NOTHING RETURNING user_id")) {
+             PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_passport_number, address_id) " +
+                     "VALUES (?, ?) ON CONFLICT (user_passport_number, address_id) DO NOTHING RETURNING user_passport_number")) {
 
             setStatement(address, addressStatement);
 
@@ -172,7 +208,7 @@ public class AddressDatabaseDAO implements AddressDAO {
             userStatement.setLong(1, userID);
             try (ResultSet resultSet = userStatement.executeQuery()) {
                 if (resultSet.next())
-                    address.getUsers().add(resultSet.getLong("user_id"));
+                    address.getUsers().add(resultSet.getLong("user_passport_number"));
             }
         }
 

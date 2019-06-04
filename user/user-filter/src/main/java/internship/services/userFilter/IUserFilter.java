@@ -7,6 +7,7 @@ import java.util.List;
 public interface IUserFilter {
     /**
      * Фильтрует список пользователей по доходу(income)
+     *
      * @param user список пользователей
      * @return список пользователей, успещно прошедшие фильтрацию
      */
