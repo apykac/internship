@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
         if (!passport.equals(user.getPassportNumber()) && userDAO.findUserByPassport(user.getPassportNumber()) != null) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("<Error>Номер пасспорта - " + user.getPassportNumber() + " уже занят</Error>")
+                    .entity("<Error>Номер паспорта - " + user.getPassportNumber() + " уже занят</Error>")
                     .build();
         }
 
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
             if (userDAO.findUserByPassport(user.getPassportNumber()) != null) {
                 return Response
                         .status(Response.Status.BAD_REQUEST)
-                        .entity("<Error>Номер пасспорта - " + user.getPassportNumber() + " уже занят</Error>")
+                        .entity("<Error>Номер паспорта - " + user.getPassportNumber() + " уже занят</Error>")
                         .build();
             }
             User newUser = userDAO.createUser(user);

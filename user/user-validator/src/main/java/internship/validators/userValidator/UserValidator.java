@@ -113,10 +113,10 @@ public class UserValidator implements IUserValidator {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             LocalDate date = LocalDate.parse(birthday, formatter);
             if (date.getYear() < 1900 || date.getYear() > 2019) {
-                vr.addError(new ValidationError("Birthday", "Введенная некорректная дата (год не может быть меньше 1900 или больше 2019"));
+                vr.addError(new ValidationError("Birthday", "Введена некорректная дата (год не может быть меньше 1900 или больше 2019)"));
             }
         } catch (Exception e) {
-            vr.addError(new ValidationError("Birthday", "Введен неправильный формат даты(формат должен быть dd-MM-yyyy) или не существующая дата"));
+            vr.addError(new ValidationError("Birthday", "Введен неправильный формат даты (формат должен быть dd-MM-yyyy) или несуществующая дата"));
         }
     }
 
@@ -174,7 +174,7 @@ public class UserValidator implements IUserValidator {
      */
     private void validateCommonNumber(ValidationResult vr, String cause, Long value) {
         if (value == null) {
-            vr.addError(new ValidationError(cause, "Значение не может быть пустым, либо содержать символов отличных от цифр"));
+            vr.addError(new ValidationError(cause, "Значение не может быть пустым, либо содержать символы, отличные от цифр"));
             return;
         }
         if (value < 0) {

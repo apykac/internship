@@ -42,7 +42,7 @@ public interface AddressDAO {
     void removeAddress(Long id);
 
     /**
-     * Проверяет удалось ли подключиться к бандлу раздающей connection к базе данных
+     * Проверяет удалось ли подключиться к бандлу раздающему connection к базе данных
      * @return true если удалось подключиться, иначе false
      */
     boolean isConnectorUp();

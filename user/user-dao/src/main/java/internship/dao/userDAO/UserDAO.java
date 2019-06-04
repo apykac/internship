@@ -4,9 +4,9 @@ import internship.models.userModel.User;
 
 public interface UserDAO {
     /**
-     * Ищет в БД данные о пользователе по пасспортным данным
+     * Ищет в БД данные о пользователе по паспортным данным
      *
-     * @param passport пасспортные данные пользователя
+     * @param passport паспортные данные пользователя
      * @return User если существует в БД пользователь с данным id, иначе null
      */
     User findUserByPassport(Long passport);
@@ -22,7 +22,7 @@ public interface UserDAO {
     /**
      * Сохраняет пользователя в БД
      * @param user данные о пользователе
-     * @return User если удалось сохранить пользователя в БД или null, если неудалось подключиться к базе данных возвращает null
+     * @return User если удалось сохранить пользователя в БД или null, если не удалось подключиться к базе данных возвращает null
      * */
     User createUser(User user);
 
@@ -33,7 +33,7 @@ public interface UserDAO {
     void removeUser(Long passport);
 
     /**
-     * Проверяет удалось ли подключиться к бандлу раздающей connection к базе данных
+     * Проверяет удалось ли подключиться к бандлу раздающему connection к базе данных
      * @return true если удалось подключиться, иначе false
      */
     boolean isConnectorUp();

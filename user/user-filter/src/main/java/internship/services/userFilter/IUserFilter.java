@@ -9,7 +9,7 @@ public interface IUserFilter {
      * Фильтрует список пользователей по доходу(income)
      *
      * @param user список пользователей
-     * @return список пользователей, успещно прошедшие фильтрацию
+     * @return список пользователей, успешно прошедших фильтрацию
      */
     List<User> filter(List<User> user);
 }
