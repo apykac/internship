@@ -150,7 +150,7 @@ public class AddressServiceImpl implements AddressService {
                     .build();
         }
 
-        if (addressDAO.findAddressById(address.getId()) == null) {
+        if (addressDAO.findAddressById(id) == null) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity("<Error>Адрес с указанным id не существует</Error>")
