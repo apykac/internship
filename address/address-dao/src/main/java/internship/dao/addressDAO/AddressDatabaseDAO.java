@@ -2,6 +2,7 @@ package internship.dao.addressDAO;
 
 import internship.connectors.postgresConnector.IConnector;
 import internship.models.addressModel.Address;
+import internship.models.addressModel.Addresses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,13 +37,13 @@ public class AddressDatabaseDAO implements AddressDAO {
 
                 Address address = new Address();
                 resultSetToAddress(resultSet, address);
-                Set<Long> userIDs = new HashSet<>();
+                Set<Long> userPassports = new HashSet<>();
                 while (resultSet.next()) {
-                    Long userId = resultSet.getLong("user_id");
+                    Long userId = resultSet.getLong("user_passport_number");
                     if (!resultSet.wasNull())
-                        userIDs.add(userId);
+                        userPassports.add(userId);
                 }
-                address.setUserId(userIDs);
+                address.setUsers(userPassports);
 
                 return address;
             } catch (SQLException e) {
@@ -59,15 +60,20 @@ public class AddressDatabaseDAO implements AddressDAO {
     }
 
     @Override
+    public Addresses findAddressesByUserPassport(Long passport) {
+        return null;
+    }
+
+    @Override
     public Address updateAddress(Long id, Address address) {
         try (Connection dbConnection = connector.getConnection();
              PreparedStatement addressStatement = dbConnection.prepareStatement("UPDATE addresses " +
                              "SET country = ?, region = ?, city = ?, street = ?, house_number = ?, apartment_number = ? " +
                              "WHERE address_id = ? RETURNING address_id, country, region, city, street, house_number, apartment_number",
                      ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-             PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_id, address_id) " +
-                     "VALUES (?, ?) ON CONFLICT (user_id, address_id) DO NOTHING RETURNING user_id");
-             PreparedStatement deleteDuplicate = dbConnection.prepareStatement("DELETE FROM user_address WHERE address_id = ? AND NOT user_id = ANY(?)")) {
+             PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_passport_number, address_id) " +
+                     "VALUES (?, ?) ON CONFLICT (user_passport_number, address_id) DO NOTHING RETURNING user_passport_number");
+             PreparedStatement deleteDuplicate = dbConnection.prepareStatement("DELETE FROM user_address WHERE address_id = ? AND NOT user_passport_number = ANY(?)")) {
 
             setStatement(address, addressStatement);
             addressStatement.setLong(7, id);
@@ -102,8 +108,8 @@ public class AddressDatabaseDAO implements AddressDAO {
                              "(country, region, city, street, house_number, apartment_number) " +
                              "VALUES (?, ?, ?, ?, ?, ?) RETURNING address_id, country, region, city, street, house_number, apartment_number",
                      ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-             PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_id, address_id) " +
-                     "VALUES (?, ?) ON CONFLICT (user_id, address_id) DO NOTHING RETURNING user_id")) {
+             PreparedStatement userStatement = dbConnection.prepareStatement("INSERT INTO user_address (user_passport_number, address_id) " +
+                     "VALUES (?, ?) ON CONFLICT (user_passport_number, address_id) DO NOTHING RETURNING user_passport_number")) {
 
             setStatement(address, addressStatement);
 
@@ -172,7 +178,7 @@ public class AddressDatabaseDAO implements AddressDAO {
             userStatement.setLong(1, userID);
             try (ResultSet resultSet = userStatement.executeQuery()) {
                 if (resultSet.next())
-                    address.getUsers().add(resultSet.getLong("user_id"));
+                    address.getUsers().add(resultSet.getLong("user_passport_number"));
             }
         }
 

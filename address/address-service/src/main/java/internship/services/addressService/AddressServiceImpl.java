@@ -79,6 +79,18 @@ public class AddressServiceImpl implements AddressService {
         }
     }
 
+    public Response getAddressesForUser(Long passport) {
+
+        if (isServicesDown()) {
+            return Response
+                    .status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity(addressServiceResponse)
+                    .build();
+        }
+
+        return null;
+    }
+
     public Response addAddress(Address address) {
 
         if (isServicesDown()) {
