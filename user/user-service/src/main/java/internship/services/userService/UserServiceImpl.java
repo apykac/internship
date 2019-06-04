@@ -5,10 +5,12 @@ import internship.models.userModel.User;
 import internship.models.userModel.Users;
 import internship.services.userFilter.IUserFilter;
 import internship.services.userService.response.ErrorResponse;
+import internship.services.userService.response.FilterResponse;
 import internship.services.userService.response.UserServiceResponse;
 import internship.validators.userValidator.IUserValidator;
 import internship.validators.userValidator.models.ValidationResult;
 
+import javax.naming.ldap.SortResponseControl;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -34,13 +36,14 @@ public class UserServiceImpl implements UserService {
 
     public Response filterUser(Users users) {
         List<User> filteredUserList;
+        ValidationResult vr = userValidator.validate(users.getUsers());
         userValidator.removeInvalidUsers(users.getUsers());
         if (users.getUsers().size()!=0) {
             filteredUserList = userFilter.filter(users.getUsers());
         } else {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("<Error>Не было получено ни одного корректного адреса для сортировки</Error>")
+                    .entity(new FilterResponse(vr, null))
                     .build();
         }
         Users filteredListWrapper = new Users();
@@ -48,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
         return Response
                 .ok()
-                .entity(filteredListWrapper)
+                .entity(new FilterResponse(vr, filteredListWrapper))
                 .build();
     }
 
