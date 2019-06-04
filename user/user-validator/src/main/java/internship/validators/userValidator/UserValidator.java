@@ -58,6 +58,11 @@ public class UserValidator implements IUserValidator {
         return vr;
     }
 
+    public void removeInvalidUsers(List<User> users){
+        users.removeIf(user -> validate(user).isValid());
+    }
+
+
     //========================
     //  Private methods
     //========================
