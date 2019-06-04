@@ -176,14 +176,8 @@ public class UserValidator implements IUserValidator {
             vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
             return;
         }
-        String trimmedNumber = value.toString().trim();
-        try {
-            int num = Integer.parseInt(trimmedNumber);
-            if (num <= 0) {
-                vr.addError(new ValidationError(cause, "Значение должно быть положительным"));
-            }
-        } catch (Exception e) {
-            vr.addError(new ValidationError(cause, "Значение должно быть числом"));
+        if (value < 0) {
+            vr.addError(new ValidationError(cause, "Значение должно быть положительным"));
         }
     }
 
