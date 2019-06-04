@@ -37,13 +37,15 @@ public class AddressValidator implements IAddressValidator {
             vr.addError(new ValidationError("Address", "Значение не должно быть null"));
             return vr;
         }
-        validateUsers(vr, address.getUsers());
         validateCountry(vr, address.getCountry());
         validateRegion(vr, address.getRegion());
         validateCity(vr, address.getCity());
         validateStreet(vr, address.getStreet());
         validateHouseNumber(vr, address.getHouseNumber());
         validateApartmentNumber(vr, address.getApartmentNumber());
+        if (vr.isValid()){
+            validateUsers(vr, address.getUsers());
+        }
         return vr;
     }
 
@@ -67,6 +69,10 @@ public class AddressValidator implements IAddressValidator {
     @Override
     public boolean isUserDAOUp() {
         return userDao != null;
+    }
+
+    public void removeInvalidAddresses(List<Address> addresses){
+        addresses.removeIf(address -> validate(address).isValid());
     }
 
 

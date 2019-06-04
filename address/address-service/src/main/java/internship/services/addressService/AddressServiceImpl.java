@@ -34,13 +34,14 @@ public class AddressServiceImpl implements AddressService {
 
     public Response sortAddress(Addresses addresses) {
         List<Address> sortedAddressList;
-        ValidationResult vr = addressValidator.validate(addresses.getAddresses());
-        if (vr.isValid()) {
+
+        addressValidator.removeInvalidAddresses(addresses.getAddresses());
+        if (addresses.getAddresses().size()!=0) {
             sortedAddressList = addressSort.sort(addresses.getAddresses());
         } else {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(vr)
+                    .entity("<Error>Не было получено ни одного корректного адреса для сортировки</Error>")
                     .build();
         }
         Addresses sortedListWrapper = new Addresses();
@@ -110,18 +111,25 @@ public class AddressServiceImpl implements AddressService {
         }
 
         ValidationResult vr = addressValidator.validate(address);
-        if (vr.isValid()) {
-            Address updatedAddress = addressDAO.updateAddress(id, address);
-            return Response
-                    .ok()
-                    .entity(updatedAddress)
-                    .build();
-        } else {
+        if (!vr.isValid()) {
             return Response
                     .ok()
                     .entity(vr)
                     .build();
         }
+
+        if (addressDAO.findAddressById(address.getId())==null){
+            return Response
+                    .ok()
+                    .entity("<Error>Адрес с указанным id не существует</Error>")
+                    .build();
+        }
+        Address updatedAddress = addressDAO.updateAddress(id, address);
+        return Response
+                .ok()
+                .entity(updatedAddress)
+                .build();
+
     }
 
     public Response deleteAddress(Long id) {

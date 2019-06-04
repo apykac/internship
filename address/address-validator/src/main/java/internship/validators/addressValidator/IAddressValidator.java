@@ -23,6 +23,12 @@ public interface IAddressValidator {
      */
     ValidationResult validate(List<Address> addresses);
 
+    /**
+     * Удаляет из списка адресов невалидные
+     * @param addresses Адреса для проверки
+     */
+    void removeInvalidAddresses(List<Address> addresses);
+
     // TODO: Что это? По логике этого здесь не должно быть.
     boolean isUserDAOUp();
 
