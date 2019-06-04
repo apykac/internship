@@ -117,7 +117,7 @@ public class AddressServiceImpl implements AddressService {
             Address newAddress = addressDAO.createAddress(address);
             if (newAddress == null) {
                 return Response
-                        .ok()
+                        .status(Response.Status.BAD_REQUEST)
                         .entity("<Error>Не удалось создать адрес.</Error>")
                         .build();
             }
@@ -127,7 +127,7 @@ public class AddressServiceImpl implements AddressService {
                     .build();
         } else {
             return Response
-                    .ok()
+                    .status(Response.Status.BAD_REQUEST)
                     .entity(vr)
                     .build();
         }

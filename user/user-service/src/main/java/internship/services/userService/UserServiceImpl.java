@@ -10,7 +10,6 @@ import internship.services.userService.response.UserServiceResponse;
 import internship.validators.userValidator.IUserValidator;
 import internship.validators.userValidator.models.ValidationResult;
 
-import javax.naming.ldap.SortResponseControl;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class UserServiceImpl implements UserService {
         List<User> filteredUserList;
         ValidationResult vr = userValidator.validate(users.getUsers());
         userValidator.removeInvalidUsers(users.getUsers());
-        if (users.getUsers().size()!=0) {
+        if (users.getUsers().size() != 0) {
             filteredUserList = userFilter.filter(users.getUsers());
         } else {
             return Response
@@ -104,7 +103,7 @@ public class UserServiceImpl implements UserService {
         if (!passport.equals(user.getPassportNumber()) && userDAO.findUserByPassport(user.getPassportNumber()) != null) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("<Error>Номер пасспорта, который вы пытаетесь установить, уже занят</Error>")
+                    .entity("<Error>Номер пасспорта - " + user.getPassportNumber() + " уже занят</Error>")
                     .build();
         }
 
@@ -126,10 +125,10 @@ public class UserServiceImpl implements UserService {
 
         ValidationResult vr = userValidator.validate(user);
         if (vr.isValid()) {
-            if(userDAO.findUserByPassport(user.getPassportNumber())!=null){
+            if (userDAO.findUserByPassport(user.getPassportNumber()) != null) {
                 return Response
                         .status(Response.Status.BAD_REQUEST)
-                        .entity("<Error>Номер пасспорта, который вы пытаетесь установить, уже занят</Error>")
+                        .entity("<Error>Номер пасспорта - " + user.getPassportNumber() + " уже занят</Error>")
                         .build();
             }
             User newUser = userDAO.createUser(user);

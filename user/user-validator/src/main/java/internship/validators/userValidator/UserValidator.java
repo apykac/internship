@@ -68,18 +68,6 @@ public class UserValidator implements IUserValidator {
     //========================
 
     /**
-     * Проверить существует ли пользователь в базе данных
-     *
-     * @param vr       Куда добавлять сообщения об ошибках
-     * @param passport Номер паспорта для проверки
-     */
-    private void validateUserForExistance(ValidationResult vr, Long passport) {
-        if (userDao.findUserByPassport(passport) != null) {
-            vr.addError(new ValidationError("User", "Пользователь с таким номером паспорта " + passport + " уже зарегистрирован"));
-        }
-    }
-
-    /**
      * Провалидировать содержимое тега <name></name>
      *
      * @param vr   Куда добавлять сообщения об ошибках
@@ -116,7 +104,20 @@ public class UserValidator implements IUserValidator {
      * @param birthday Значение для проверки
      */
     private void validateBirthday(ValidationResult vr, String birthday) {
-        validateBirthday(vr, "Birthday", birthday);
+        if (birthday == null) {
+            vr.addError(new ValidationError("Birthday", "Значение не может быть пустым"));
+            return;
+        }
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate date = LocalDate.parse(birthday, formatter);
+            if (date.getYear() < 1900 || date.getYear() > 2019) {
+                vr.addError(new ValidationError("Birthday", "Введенная некорректная дата (год не может быть меньше 1900 или больше 2019"));
+            }
+        } catch (Exception e) {
+            vr.addError(new ValidationError("Birthday", "Введен неправильный формат даты(формат должен быть dd-MM-yyyy) или не существующая дата"));
+        }
     }
 
     /**
@@ -181,27 +182,6 @@ public class UserValidator implements IUserValidator {
         }
     }
 
-    /**
-     * Провалидировать тег Birthday.
-     *
-     * @param vr    Куда добавлять сообщения об ошибках
-     * @param cause Название валидируемого тега
-     * @param value Значение для проверки
-     */
-    private void validateBirthday(ValidationResult vr, String cause, String value) {
-        if (value == null) {
-            vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
-            return;
-        }
 
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate date = LocalDate.parse(value, formatter);
-            if (date.getYear() < 1900 || date.getYear() > 2019) {
-                vr.addError(new ValidationError(cause, "Введенная некорректная дата (год не может быть меньше 1900 или больше 2019"));
-            }
-        } catch (Exception e) {
-            vr.addError(new ValidationError(cause, "Введен неправильный формат даты(формат должен быть dd-MM-yyyy) или не существующая дата"));
-        }
-    }
+
 }
