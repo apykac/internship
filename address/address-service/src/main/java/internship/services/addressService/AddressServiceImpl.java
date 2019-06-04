@@ -36,7 +36,7 @@ public class AddressServiceImpl implements AddressService {
         List<Address> sortedAddressList;
 
         addressValidator.removeInvalidAddresses(addresses.getAddresses());
-        if (addresses.getAddresses().size()!=0) {
+        if (addresses.getAddresses().size() != 0) {
             sortedAddressList = addressSort.sort(addresses.getAddresses());
         } else {
             return Response
@@ -113,14 +113,14 @@ public class AddressServiceImpl implements AddressService {
         ValidationResult vr = addressValidator.validate(address);
         if (!vr.isValid()) {
             return Response
-                    .ok()
+                    .status(Response.Status.BAD_REQUEST)
                     .entity(vr)
                     .build();
         }
 
-        if (addressDAO.findAddressById(address.getId())==null){
+        if (addressDAO.findAddressById(address.getId()) == null) {
             return Response
-                    .ok()
+                    .status(Response.Status.BAD_REQUEST)
                     .entity("<Error>Адрес с указанным id не существует</Error>")
                     .build();
         }
