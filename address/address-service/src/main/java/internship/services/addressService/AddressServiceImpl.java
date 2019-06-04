@@ -5,6 +5,7 @@ import internship.models.addressModel.Address;
 import internship.models.addressModel.Addresses;
 import internship.services.addressService.response.AddressServiceResponse;
 import internship.services.addressService.response.ErrorResponse;
+import internship.services.addressService.response.SortResponse;
 import internship.services.addressSort.IAddressSort;
 import internship.validators.addressValidator.IAddressValidator;
 import internship.validators.addressValidator.models.ValidationResult;
@@ -28,31 +29,33 @@ public class AddressServiceImpl implements AddressService {
         this.addressDAO = addressDAO;
     }
 
-    void setAddressSort(IAddressSort addressSort){
-        this.addressSort=addressSort;
+    void setAddressSort(IAddressSort addressSort) {
+        this.addressSort = addressSort;
     }
 
-    public Response sortAddress(Addresses addresses){
+    public Response sortAddress(Addresses addresses) {
         List<Address> sortedAddressList;
+
         ValidationResult vr = addressValidator.validate(addresses.getAddresses());
-        if(vr.isValid()){
-            sortedAddressList=addressSort.sort(addresses.getAddresses());
+        addressValidator.removeInvalidAddresses(addresses.getAddresses());
+        if (addresses.getAddresses().size() != 0) {
+            sortedAddressList = addressSort.sort(addresses.getAddresses());
         } else {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(vr)
+                    .entity(new SortResponse(vr, null))
                     .build();
         }
-        Addresses sortedListWrapper=new Addresses();
+        Addresses sortedListWrapper = new Addresses();
         sortedListWrapper.setAddresses(sortedAddressList);
 
         return Response
                 .ok()
-                .entity(sortedListWrapper)
+                .entity(new SortResponse(vr, sortedListWrapper))
                 .build();
     }
 
-    public Response getAddress( Long id) {
+    public Response getAddress(Long id) {
 
         if (isServicesDown()) {
             return Response
@@ -76,6 +79,30 @@ public class AddressServiceImpl implements AddressService {
         }
     }
 
+    public Response getAddressesForUser(Long passport) {
+
+        if (isServicesDown()) {
+            return Response
+                    .status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity(addressServiceResponse)
+                    .build();
+        }
+
+        Addresses addressesFromDB = addressDAO.findAddressesByUserPassport(passport);
+        if (addressesFromDB == null) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(new ErrorResponse(ErrorResponse.NO_ADDRESSES_WITH_SUCH_PASSPORT))
+                    .build();
+        } else {
+            return Response
+                    .ok()
+                    .entity(addressesFromDB)
+                    .build();
+
+        }
+    }
+
     public Response addAddress(Address address) {
 
         if (isServicesDown()) {
@@ -88,13 +115,19 @@ public class AddressServiceImpl implements AddressService {
         ValidationResult vr = addressValidator.validate(address);
         if (vr.isValid()) {
             Address newAddress = addressDAO.createAddress(address);
+            if (newAddress == null) {
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .entity("<Error>Не удалось создать адрес.</Error>")
+                        .build();
+            }
             return Response
                     .ok()
                     .entity(newAddress)
                     .build();
         } else {
             return Response
-                    .ok()
+                    .status(Response.Status.BAD_REQUEST)
                     .entity(vr)
                     .build();
         }
@@ -110,18 +143,25 @@ public class AddressServiceImpl implements AddressService {
         }
 
         ValidationResult vr = addressValidator.validate(address);
-        if (vr.isValid()) {
-            Address updatedAddress = addressDAO.updateAddress(id, address);
+        if (!vr.isValid()) {
             return Response
-                    .ok()
-                    .entity(updatedAddress)
-                    .build();
-        } else {
-            return Response
-                    .ok()
+                    .status(Response.Status.BAD_REQUEST)
                     .entity(vr)
                     .build();
         }
+
+        if (addressDAO.findAddressById(id) == null) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("<Error>Адрес с указанным id не существует</Error>")
+                    .build();
+        }
+        Address updatedAddress = addressDAO.updateAddress(id, address);
+        return Response
+                .ok()
+                .entity(updatedAddress)
+                .build();
+
     }
 
     public Response deleteAddress(Long id) {

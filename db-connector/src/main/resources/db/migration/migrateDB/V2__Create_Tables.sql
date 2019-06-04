@@ -26,15 +26,15 @@ CREATE TABLE addresses
 
 CREATE TABLE user_address
 (
-    user_id    bigint NOT NULL,
+    user_passport_number    bigint NOT NULL,
     address_id bigint NOT NULL,
-    CONSTRAINT user_address_pkey PRIMARY KEY (user_id, address_id),
+    CONSTRAINT user_address_pkey PRIMARY KEY (user_passport_number, address_id),
     CONSTRAINT "address_FK" FOREIGN KEY (address_id)
         REFERENCES public.addresses (address_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE,
-    CONSTRAINT "user_FK" FOREIGN KEY (user_id)
-        REFERENCES public.users (user_id) MATCH SIMPLE
+    CONSTRAINT "user_FK" FOREIGN KEY (user_passport_number)
+        REFERENCES public.users (passport_number) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE
 );

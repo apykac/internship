@@ -9,6 +9,7 @@ public interface IAddressValidator {
 
     /**
      * Проверяет адрес на корректность заполнения данных
+     *
      * @param address Адрес для проверки
      * @return Возвращает результат проверки
      */
@@ -16,12 +17,24 @@ public interface IAddressValidator {
 
     /**
      * Проверяет список адресов на корректность.
+     *
      * @param addresses Адреса для проверки
      * @return Возвращает результат проверки
      */
     ValidationResult validate(List<Address> addresses);
 
-    // TODO: Что это? По логике этого здесь не должно быть.
+    /**
+     * Удаляет из списка адресов невалидные
+     *
+     * @param addresses Адреса для проверки
+     */
+    void removeInvalidAddresses(List<Address> addresses);
+
+    /**
+     * Проверяет имеется ли у валидатора ссылка на сервис user-dao
+     *
+     * @return Возвращает true, если всё в порядке
+     */
     boolean isUserDAOUp();
 
 }

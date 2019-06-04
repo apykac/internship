@@ -13,7 +13,7 @@
     <name>AddressSort</name>
     <description>AddressSort for VSK internship</description>
 
-    <artifactId>sort-address</artifactId>
+    <artifactId>address-sort</artifactId>
     <build>
         <plugins>
             <plugin>

@@ -62,7 +62,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
             addressService.setAddressDAO((AddressDAO) trackedService);
         }
 
-        if(trackedService instanceof IAddressSort){
+        if (trackedService instanceof IAddressSort) {
             addressService.setAddressSort((IAddressSort) trackedService);
         }
 

@@ -29,7 +29,7 @@
                         <Bundle-Activator>internship.validators.userValidator.Activator</Bundle-Activator>
                         <Export-Package>
                             internship.validators.userValidator,
-                            internship.validators.userValidator.response
+                            internship.validators.userValidator.models
                         </Export-Package>
                     </instructions>
                 </configuration>

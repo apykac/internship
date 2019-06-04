@@ -10,6 +10,7 @@ interface AddressService {
 
     /**
      * Получить адрес по его id.
+     *
      * @param id id запрашиваемого адреса
      * @return Возвращает искомый адрес либо сообщение об ошибке. Выходные данные в формате XML.
      */
@@ -19,7 +20,19 @@ interface AddressService {
     Response getAddress(@PathParam("id") Long id);
 
     /**
+     * Получить адресы по номеру паспорта пользователя.
+     *
+     * @param passport Номер паспорта пользователя, для которого запрашиваются адресы
+     * @return Возвращает искомый список адресов либо сообщение об ошибке. Выходные данные в формате XML.
+     */
+    @GET
+    @Path("/addresses/list/{passport}/")
+    @Produces("application/xml")
+    Response getAddressesForUser(@PathParam("passport") Long passport);
+
+    /**
      * Создать новый адрес.
+     *
      * @param address Адрес для создания в формате XML.
      * @return Возвращает созданный адрес либо сообщение об ошибке. Выходные данные в формате XML.
      */
@@ -30,7 +43,8 @@ interface AddressService {
 
     /**
      * Заменить адрес с указанным id.
-     * @param id Id адреса, который будет замещён
+     *
+     * @param id      Id адреса, который будет замещён
      * @param address Новое значение адреса в формате XML
      * @return Возвращает созданный адрес либо сообщение об ошибке. Выходные данные в формате XML.
      */
@@ -39,9 +53,9 @@ interface AddressService {
     @Produces("application/xml")
     Response updateAddress(@PathParam("id") Long id, Address address);
 
-    //TODO: Сделать чтоб что-нибудь возвращал
     /**
      * Удалить адрес с указанным id.
+     *
      * @param id Id адреса, который будет удалён
      * @return Возвращает ничего либо сообщение об ошибке. Выходные данные в формате XML.
      */
@@ -52,6 +66,7 @@ interface AddressService {
 
     /**
      * Отсортировать адреса по регионам.
+     *
      * @param addresses Адреса для сортировки
      * @return Возвращает отсортированный список либо сообщение об ошибке. Выходные данные в формате XML.
      */

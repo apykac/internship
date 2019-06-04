@@ -30,7 +30,7 @@ public class Address {
         return users;
     }
 
-    public void setUserId(Set<Long> users) {
+    public void setUsers(Set<Long> users) {
         this.users = users;
     }
 

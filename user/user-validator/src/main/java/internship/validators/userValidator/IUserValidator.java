@@ -1,25 +1,32 @@
 package internship.validators.userValidator;
 
 import internship.models.userModel.User;
-import internship.validators.userValidator.response.BadUserResponse;
+import internship.validators.userValidator.models.ValidationResult;
 
 import java.util.List;
 
 public interface IUserValidator {
 
-    boolean isNameValid(String name);
+    /**
+     * Проверяет пользователей на корректность заполнения данных
+     *
+     * @param user Пользователь для проверки
+     * @return Возвращает результат проверки
+     */
+    ValidationResult validate(User user);
 
-    boolean isDateBirthdayValid(String birthday);
+    /**
+     * Проверяет список пользователей на корректность.
+     *
+     * @param users Пользователи для проверки
+     * @return Возвращает результат проверки
+     */
+    ValidationResult validate(List<User> users);
 
-    boolean isPassportNumberValid(Long passport);
-
-    boolean isValid(User user);
-
-    boolean isListValid(List<User> users);
-
-    boolean isUserExistsPost(Long passport);
-
-    boolean isUserExistsPut(Long passport, Long passportForUpdate);
-
-    BadUserResponse getErrorMessage();
+    /**
+     * Удаляет из списка невалидных пользователей
+     *
+     * @param users Пользователи для проверки
+     */
+    void removeInvalidUsers(List<User> users);
 }
