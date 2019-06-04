@@ -48,10 +48,10 @@ public class UserValidator implements IUserValidator {
             vr.addError(new ValidationError("User", "Значение не должно быть null"));
             return vr;
         }
-        for (User user : users) {
+        for (int i = 0; i<users.size(); i++) {
+            User user = users.get(i);
             ValidationResult vr1 = validate(user);
-            for (int i = 0; i < vr1.getErrors().size(); i++) {
-                ValidationError error = vr1.getErrors().get(i);
+            for (ValidationError error: vr1.getErrors()) {
                 vr.addError(new ValidationError("user[" + i + "]:" + error.getCause(), error.getMessage()));
             }
         }
@@ -172,12 +172,13 @@ public class UserValidator implements IUserValidator {
      * @param value Значение для проверки
      */
     private void validateCommonNumber(ValidationResult vr, String cause, Long value) {
-        if (value == null || value.toString().length() == 0) {
+        if (value == null) {
             vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
             return;
         }
-        if (value < 0) {
-            vr.addError(new ValidationError(cause, "Значение должно быть положительным"));
+        if (value.toString().length() == 0) {
+            vr.addError(new ValidationError(cause, "Значение должно быть числом"));
+            return;
         }
     }
 

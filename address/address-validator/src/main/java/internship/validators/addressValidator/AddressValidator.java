@@ -56,10 +56,10 @@ public class AddressValidator implements IAddressValidator {
             vr.addError(new ValidationError("Address", "Значение не должно быть null"));
             return vr;
         }
-        for (Address address : addresses) {
-            ValidationResult vr1 = validate(address);
-            for (int i = 0; i < vr1.getErrors().size(); i++) {
-                ValidationError error = vr1.getErrors().get(i);
+
+        for (int i = 0; i< addresses.size(); i++) {
+            ValidationResult vr1 = validate(addresses.get(i));
+            for (ValidationError error: vr1.getErrors()) {
                 vr.addError(new ValidationError("address[" + i + "]:" + error.getCause(), error.getMessage()));
             }
         }
@@ -72,7 +72,7 @@ public class AddressValidator implements IAddressValidator {
     }
 
     public void removeInvalidAddresses(List<Address> addresses){
-        addresses.removeIf(address -> validate(address).isValid());
+        addresses.removeIf(address -> !validate(address).isValid());
     }
 
 

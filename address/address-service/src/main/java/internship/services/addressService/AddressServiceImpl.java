@@ -5,6 +5,7 @@ import internship.models.addressModel.Address;
 import internship.models.addressModel.Addresses;
 import internship.services.addressService.response.AddressServiceResponse;
 import internship.services.addressService.response.ErrorResponse;
+import internship.services.addressService.response.SortResponse;
 import internship.services.addressSort.IAddressSort;
 import internship.validators.addressValidator.IAddressValidator;
 import internship.validators.addressValidator.models.ValidationResult;
@@ -35,13 +36,14 @@ public class AddressServiceImpl implements AddressService {
     public Response sortAddress(Addresses addresses) {
         List<Address> sortedAddressList;
 
+        ValidationResult vr = addressValidator.validate(addresses.getAddresses());
         addressValidator.removeInvalidAddresses(addresses.getAddresses());
         if (addresses.getAddresses().size() != 0) {
             sortedAddressList = addressSort.sort(addresses.getAddresses());
         } else {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("<Error>Не было получено ни одного корректного адреса для сортировки</Error>")
+                    .entity(new SortResponse(vr,null))
                     .build();
         }
         Addresses sortedListWrapper = new Addresses();
@@ -49,7 +51,7 @@ public class AddressServiceImpl implements AddressService {
 
         return Response
                 .ok()
-                .entity(sortedListWrapper)
+                .entity(new SortResponse(vr,sortedListWrapper))
                 .build();
     }
 
