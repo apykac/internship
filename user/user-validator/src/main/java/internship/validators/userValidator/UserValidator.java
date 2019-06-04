@@ -59,7 +59,7 @@ public class UserValidator implements IUserValidator {
     }
 
     public void removeInvalidUsers(List<User> users){
-        users.removeIf(user -> validate(user).isValid());
+        users.removeIf(user -> !validate(user).isValid());
     }
 
 
