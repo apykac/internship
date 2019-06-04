@@ -85,18 +85,31 @@ public class UserServiceImpl implements UserService {
         }
 
         ValidationResult vr = userValidator.validate(user);
-        if (vr.isValid()) {
-            User updatedUser = userDAO.updateUser(passport, user);
+        if (!vr.isValid()) {
             return Response
-                    .ok()
-                    .entity(updatedUser)
-                    .build();
-        } else {
-            return Response
-                    .ok()
+                    .status(Response.Status.BAD_REQUEST)
                     .entity(vr)
                     .build();
         }
+
+        if (userDAO.findUserByPassport(passport) == null) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("<Error>Пользователь, которого вы пытаетесь отредактировтаь не существует</Error>")
+                    .build();
+        }
+        if (!passport.equals(user.getPassportNumber()) && userDAO.findUserByPassport(user.getPassportNumber()) != null) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("<Error>Номер пасспорта, который вы пытаетесь установить, уже занят</Error>")
+                    .build();
+        }
+
+        User updatedUser = userDAO.updateUser(passport, user);
+        return Response
+                .ok()
+                .entity(updatedUser)
+                .build();
     }
 
     public Response addUser(User user) {
