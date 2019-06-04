@@ -25,12 +25,14 @@ public interface IAddressValidator {
 
     /**
      * Удаляет из списка адресов невалидные
+     *
      * @param addresses Адреса для проверки
      */
     void removeInvalidAddresses(List<Address> addresses);
 
     /**
      * Проверяет имеется ли у валидатора ссылка на сервис user-dao
+     *
      * @return Возвращает true, если всё в порядке
      */
     boolean isUserDAOUp();

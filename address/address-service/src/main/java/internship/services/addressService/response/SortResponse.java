@@ -5,7 +5,7 @@ import internship.validators.addressValidator.models.ValidationResult;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name="SortResponse")
+@XmlRootElement(name = "SortResponse")
 public class SortResponse {
     private ValidationResult validationResult;
     private Addresses sorted;

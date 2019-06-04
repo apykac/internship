@@ -48,17 +48,17 @@ public class UserValidator implements IUserValidator {
             vr.addError(new ValidationError("User", "Значение не должно быть null"));
             return vr;
         }
-        for (int i = 0; i<users.size(); i++) {
+        for (int i = 0; i < users.size(); i++) {
             User user = users.get(i);
             ValidationResult vr1 = validate(user);
-            for (ValidationError error: vr1.getErrors()) {
+            for (ValidationError error : vr1.getErrors()) {
                 vr.addError(new ValidationError("user[" + i + "]:" + error.getCause(), error.getMessage()));
             }
         }
         return vr;
     }
 
-    public void removeInvalidUsers(List<User> users){
+    public void removeInvalidUsers(List<User> users) {
         users.removeIf(user -> !validate(user).isValid());
     }
 
@@ -181,7 +181,6 @@ public class UserValidator implements IUserValidator {
             vr.addError(new ValidationError(cause, "Значение должно быть положительным"));
         }
     }
-
 
 
 }

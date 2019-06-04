@@ -25,6 +25,7 @@ public interface IUserValidator {
 
     /**
      * Удаляет из списка невалидных пользователей
+     *
      * @param users Пользователи для проверки
      */
     void removeInvalidUsers(List<User> users);

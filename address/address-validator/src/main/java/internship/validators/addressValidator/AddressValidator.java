@@ -1,6 +1,5 @@
 package internship.validators.addressValidator;
 
-import internship.dao.addressDAO.AddressDAO;
 import internship.dao.userDAO.UserDAO;
 import internship.models.addressModel.Address;
 import internship.validators.addressValidator.models.ValidationError;
@@ -21,12 +20,6 @@ public class AddressValidator implements IAddressValidator {
         this.userDao = userDao;
     }
 
-    private AddressDAO addressDao;
-
-    void setAddressDao(AddressDAO addressDao) {
-        this.addressDao = addressDao;
-    }
-
     //========================
     //  Interface methods
     //========================
@@ -43,7 +36,7 @@ public class AddressValidator implements IAddressValidator {
         validateStreet(vr, address.getStreet());
         validateHouseNumber(vr, address.getHouseNumber());
         validateApartmentNumber(vr, address.getApartmentNumber());
-        if (vr.isValid()){
+        if (vr.isValid()) {
             validateUsers(vr, address.getUsers());
         }
         return vr;
@@ -57,9 +50,9 @@ public class AddressValidator implements IAddressValidator {
             return vr;
         }
 
-        for (int i = 0; i< addresses.size(); i++) {
+        for (int i = 0; i < addresses.size(); i++) {
             ValidationResult vr1 = validate(addresses.get(i));
-            for (ValidationError error: vr1.getErrors()) {
+            for (ValidationError error : vr1.getErrors()) {
                 vr.addError(new ValidationError("address[" + i + "]:" + error.getCause(), error.getMessage()));
             }
         }
@@ -71,7 +64,7 @@ public class AddressValidator implements IAddressValidator {
         return userDao != null;
     }
 
-    public void removeInvalidAddresses(List<Address> addresses){
+    public void removeInvalidAddresses(List<Address> addresses) {
         addresses.removeIf(address -> !validate(address).isValid());
     }
 
@@ -104,7 +97,6 @@ public class AddressValidator implements IAddressValidator {
             vr.addError(new ValidationError("Users", "Адрес должен иметь как минимум одного зарегестрированного в нём пользователя"));
             return;
         }
-        int userNum = 0;
         for (Long passportNumber : users) {
             validateUserForExistence(vr, passportNumber);
         }
@@ -182,13 +174,13 @@ public class AddressValidator implements IAddressValidator {
             vr.addError(new ValidationError(cause, "Значение не может быть пустым"));
             return;
         }
-        String trimedValue = value.trim();
-        if (trimedValue.length() < 3) {
+        String trimmedValue = value.trim();
+        if (trimmedValue.length() < 3) {
             vr.addError(new ValidationError(cause, "Значение не может быть короче 3 символов"));
             return;
         }
-        for (int i = 0; i < trimedValue.length(); i++) {
-            if (Character.isDigit(trimedValue.charAt(i))) {
+        for (int i = 0; i < trimmedValue.length(); i++) {
+            if (Character.isDigit(trimmedValue.charAt(i))) {
                 vr.addError(new ValidationError(cause, "Значение не может содержать цифры"));
                 return;
             }

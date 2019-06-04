@@ -43,7 +43,7 @@ public class AddressServiceImpl implements AddressService {
         } else {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(new SortResponse(vr,null))
+                    .entity(new SortResponse(vr, null))
                     .build();
         }
         Addresses sortedListWrapper = new Addresses();
@@ -51,7 +51,7 @@ public class AddressServiceImpl implements AddressService {
 
         return Response
                 .ok()
-                .entity(new SortResponse(vr,sortedListWrapper))
+                .entity(new SortResponse(vr, sortedListWrapper))
                 .build();
     }
 

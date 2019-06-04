@@ -6,7 +6,7 @@ import internship.validators.userValidator.models.ValidationResult;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name="FilterResponse")
+@XmlRootElement(name = "FilterResponse")
 public class FilterResponse {
     private ValidationResult validationResult;
     private Users sorted;
