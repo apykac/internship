@@ -42,8 +42,6 @@ interface AddressService {
     @Produces("application/xml")
     Response updateAddress(@PathParam("id") Long id, Address address);
 
-    //TODO: Сделать чтоб что-нибудь возвращал
-
     /**
      * Удалить адрес с указанным id.
      *
