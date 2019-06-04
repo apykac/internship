@@ -37,15 +37,16 @@ public class AddressDatabaseDAO implements AddressDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                Address address = new Address();
-                resultSetToAddress(resultSet, address);
+                Address address = resultSetToAddress(resultSet, new Address());
                 Set<Long> userPassports = new HashSet<>();
                 while (resultSet.next()) {
                     Long userId = resultSet.getLong("user_passport_number");
                     if (!resultSet.wasNull())
                         userPassports.add(userId);
                 }
-                address.setUsers(userPassports);
+                if (address != null) {
+                    address.setUsers(userPassports);
+                }
 
                 return address;
             } catch (SQLException e) {
@@ -188,7 +189,7 @@ public class AddressDatabaseDAO implements AddressDAO {
         preparedStatement.setString(6, address.getApartmentNumber());
     }
 
-    private void resultSetToAddress(ResultSet resultSet, Address address) throws SQLException {
+    private Address resultSetToAddress(ResultSet resultSet, Address address) throws SQLException {
         if (resultSet.next()) {
             address.setId(resultSet.getLong("address_id"));
             address.setCountry(resultSet.getString("country"));
@@ -199,6 +200,9 @@ public class AddressDatabaseDAO implements AddressDAO {
             address.setApartmentNumber(resultSet.getString("apartment_number"));
 
             resultSet.beforeFirst();
+            return address;
+        } else {
+            return null;
         }
     }
 

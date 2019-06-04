@@ -115,8 +115,9 @@ public class UserDatabaseDAO implements UserDAO {
             user.setPassportNumber(resultSet.getLong("passport_number"));
             user.setIncome(resultSet.getLong("income"));
             return user;
-        } else
+        } else {
             return null;
+        }
     }
 
     private void setStatement(User user, PreparedStatement preparedStatement) throws SQLException {
