@@ -91,6 +91,12 @@ public class AddressServiceImpl implements AddressService {
         ValidationResult vr = addressValidator.validate(address);
         if (vr.isValid()) {
             Address newAddress = addressDAO.createAddress(address);
+            if (newAddress==null){
+                return Response
+                        .ok()
+                        .entity("<Error>Не удалось создать адрес.</Error>")
+                        .build();
+            }
             return Response
                     .ok()
                     .entity(newAddress)
