@@ -41,7 +41,7 @@ public class UserValidator implements IUserValidator {
         return vr;
     }
 
-    //TODO: Раньше валидация удаляла некорректные адреса из списка. Теперь не удаляет. Она и не должна, но другой метод мог сломаться (надо проверить).
+
     public ValidationResult validate(List<User> users) {
         ValidationResult vr = new ValidationResult();
         if (users == null) {
